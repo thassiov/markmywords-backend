@@ -34,7 +34,6 @@ class SelectionService {
     selectionId: string
   ): Promise<IGetSelectionDto | null> {
     try {
-      selectionIdSchema.parse(selectionId);
       const selection = await this.repository.retrieveSelection(selectionId);
 
       if (!selection) {
