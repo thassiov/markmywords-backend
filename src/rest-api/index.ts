@@ -9,6 +9,9 @@ import { logger } from '../utils/logger';
 
 const api = express();
 
+// @TODO enable compression
+api.use(express.json({ limit: '100kb' }));
+api.use(express.urlencoded({ limit: '100kb' }));
 api.use(pinoHttp());
 api.use(cors());
 api.use(helmet());

@@ -45,6 +45,14 @@ type IGetSelectionDto = z.infer<typeof getSelectionDtoSchema>;
 type ICreateSelectionDto = z.infer<typeof createSelectionDtoSchema>;
 
 class SelectionDto {
+  static rawJsonToSelectionDto(selection: any): ICreateSelectionDto {
+    return {
+      rawText: selection.rawText,
+      text: selection.text || '',
+      url: selection.url,
+    };
+  }
+
   static modelToGetSelection(selection: ISelection): IGetSelectionDto {
     return {
       id: selection.id ?? undefined,

@@ -38,3 +38,7 @@ export class SelectionDataConversionError extends CustomError {
 export class DatabaseInstanceError extends CustomError {
   name = 'DatabaseInstanceError';
 }
+
+export class EndpointHandlerError extends CustomError {
+  name = 'EndpointHandlerError';
+}
