@@ -1,3 +1,7 @@
+import { faker } from '@faker-js/faker';
+
+import { ISelection } from '../../../models';
+
 const selections = [
   {
     text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed iaculis hendrerit ultricies. Nulla facilisi. Fusce condimentum feugiat libero, sit amet tempus tortor facilisis vel. Curabitur sed leo ut quam gravida varius vel id ex.
@@ -23,4 +27,21 @@ Pellentesque euismod diam non ipsum scelerisque, et cursus libero condimentum. V
   },
 ];
 
-export { selections };
+type MockSelectionOpts = {
+  includeId?: boolean;
+  useCleanText?: boolean;
+};
+
+function getMockSelection(
+  opts: MockSelectionOpts = { includeId: false, useCleanText: true }
+) {
+  const mockSelection = {
+    id: opts.includeId ? faker.string.uuid() : undefined,
+    rawText: opts.useCleanText ? selections[0]!.text : selections[0]!.rawText,
+    url: faker.internet.url(),
+  } as ISelection;
+
+  return mockSelection;
+}
+
+export { selections, getMockSelection };

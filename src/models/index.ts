@@ -1,4 +1,6 @@
+import { db } from './db';
 import {
+  SelectionModel,
   selectionSchema,
   getSelectionDtoSchema,
   IGetSelectionDto,
@@ -6,7 +8,12 @@ import {
   SelectionDto,
 } from './selection';
 
+(async () => {
+  await db.sync();
+})();
+
 export {
+  SelectionModel,
   selectionSchema,
   getSelectionDtoSchema,
   IGetSelectionDto,

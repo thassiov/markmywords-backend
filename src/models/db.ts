@@ -1,15 +1,22 @@
-import { ISelection } from './selection';
+import { Sequelize } from 'sequelize';
 
-type IDB = {
-  create: (...args: unknown[]) => Promise<string>;
-  findOne: (_: string) => Promise<ISelection>;
-  deleteOne: (_: string) => Promise<boolean>;
-};
+import { configs } from '../utils/configs';
+import { DatabaseInstanceError } from '../utils/errors';
 
-const db: IDB = {
-  create: async (..._: unknown[]) => 'id',
-  findOne: async (_: string) => ({}) as ISelection,
-  deleteOne: async (_: string) => true,
-};
+let db: Sequelize;
 
-export { db, IDB };
+try {
+  const dbConnectString =
+    configs.dbType == 'sqlite'
+      ? `${configs.dbType}:${configs.dbLocation}`
+      : `${configs.dbType}://${configs.dbUser}:${configs.dbPassword}@${configs.dbHost}:${configs.dbPort}/${configs.dbName}`;
+
+  db = new Sequelize(dbConnectString);
+} catch (error) {
+  throw new DatabaseInstanceError(
+    'Error creating database instance. Please check the database configuration and connection parameters',
+    { cause: error as Error }
+  );
+}
+
+export { db };

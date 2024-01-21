@@ -1,4 +1,32 @@
+import { DataTypes, Model } from 'sequelize';
 import { z } from 'zod';
+import { db } from '../db';
+
+class SelectionModel extends Model {}
+
+SelectionModel.init(
+  {
+    id: {
+      type: DataTypes.UUIDV4,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
+    },
+    text: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    rawText: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    url: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+  },
+  { sequelize: db, modelName: 'selection' }
+);
 
 const selectionSchema = z.object({
   id: z.string().uuid().optional(),
@@ -45,6 +73,7 @@ class SelectionDto {
 }
 
 export {
+  SelectionModel,
   selectionSchema,
   getSelectionDtoSchema,
   createSelectionDtoSchema,

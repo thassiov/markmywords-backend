@@ -34,3 +34,7 @@ export class RepositoryError extends CustomError {
 export class SelectionDataConversionError extends CustomError {
   name = 'SelectionDataConversionError';
 }
+
+export class DatabaseInstanceError extends CustomError {
+  name = 'DatabaseInstanceError';
+}
