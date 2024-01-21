@@ -10,6 +10,7 @@ const configs = {
   dbHost: process.env.DB_HOST || 'localhost',
   dbPort: process.env.DB_PORT || 5432,
   dbName: process.env.DB_NAME || 'mmw',
+  apiPort: process.env.API_PORT || 8080,
 };
 
 export { configs };
