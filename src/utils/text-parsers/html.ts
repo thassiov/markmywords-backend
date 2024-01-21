@@ -3,7 +3,7 @@ import { SelectionDataConversionError } from '../errors';
 
 function htmlToPlainText(htmlString: string): string {
   try {
-    const converted = convert(htmlString);
+    const converted = convert(htmlString, { wordwrap: false });
     return converted;
   } catch (error) {
     throw new SelectionDataConversionError(
