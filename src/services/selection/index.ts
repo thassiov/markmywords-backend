@@ -1,21 +1,13 @@
-import { z } from 'zod';
-import {
-  ICreateSelectionDto,
-  IGetSelectionDto,
-  createSelectionDtoSchema,
-} from '../../models/selection';
+import { ICreateSelectionDto, IGetSelectionDto } from '../../models/selection';
 import { SelectionRepository } from '../../repositories/selection';
 import { ServiceError } from '../../utils/errors';
 import { htmlToPlainText } from '../../utils/text-parsers';
-
-const selectionIdSchema = z.string().uuid();
 
 class SelectionService {
   constructor(private readonly repository: SelectionRepository) {}
 
   async createNew(selection: ICreateSelectionDto): Promise<string> {
     try {
-      createSelectionDtoSchema.parse(selection);
       selection.text = htmlToPlainText(selection.rawText);
       const selectionId = await this.repository.createNew(selection);
       return selectionId;
@@ -55,8 +47,6 @@ class SelectionService {
 
   async deleteSelection(selectionId: string): Promise<boolean> {
     try {
-      selectionIdSchema.parse(selectionId);
-
       const result = await this.repository.deleteSelection(selectionId);
 
       if (!result) {

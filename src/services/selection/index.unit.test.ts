@@ -2,13 +2,14 @@ import { faker } from '@faker-js/faker';
 
 import { ICreateSelectionDto } from '../../models/selection';
 import { SelectionService } from '.';
-import { SelectionRepository } from '../../repositories/selection';
 import {
   getMockSelection,
   selections,
 } from '../../utils/tests/mocks/selection';
 import { htmlToPlainText } from '../../utils/text-parsers';
-import { Sequelize } from 'sequelize';
+import { selectionRepository } from '../../repositories';
+
+jest.mock('../../repositories/selection');
 
 jest.mock('../../utils/text-parsers', () => {
   return {
@@ -23,50 +24,27 @@ describe('Selection Service', () => {
   });
 
   describe('create', () => {
-    it.each([[null], ['selection'], [1], [[]], [{}], [{ url: 1, raw: 1 }]])(
-      'should fail with invalid data format (%p)',
-      async (selection) => {
-        const mockSelectionRepository = new SelectionRepository(
-          {} as Sequelize
-        );
-        jest
-          .spyOn(mockSelectionRepository, 'createNew')
-          .mockImplementationOnce(async (_: ICreateSelectionDto) =>
-            faker.string.uuid()
-          );
-
-        const selectionService = new SelectionService(mockSelectionRepository);
-        expect(() =>
-          selectionService.createNew(selection as ICreateSelectionDto)
-        ).rejects.toThrow('Could not create new selection');
-      }
-    );
-
     it('should create a new selection', async () => {
-      const mockSelectionRepository = new SelectionRepository({} as Sequelize);
-      jest
-        .spyOn(mockSelectionRepository, 'createNew')
-        .mockImplementationOnce(async (_: ICreateSelectionDto) =>
-          faker.string.uuid()
-        );
-      const selectionService = new SelectionService(mockSelectionRepository);
+      const mockId = faker.string.uuid();
+      (selectionRepository.createNew as jest.Mock).mockResolvedValueOnce(
+        mockId
+      );
+      const selectionService = new SelectionService(selectionRepository);
       const mockSelection = getMockSelection();
 
       const id = await selectionService.createNew(
         mockSelection as ICreateSelectionDto
       );
 
-      expect(typeof id).toBe('string');
+      expect(id).toEqual(mockId);
     });
 
     it('should create a selection and the text must be stripped of html tags', async () => {
-      const mockSelectionRepository = new SelectionRepository({} as Sequelize);
-      jest
-        .spyOn(mockSelectionRepository, 'createNew')
-        .mockImplementationOnce(async (_: ICreateSelectionDto) =>
-          faker.string.uuid()
-        );
-      const selectionService = new SelectionService(mockSelectionRepository);
+      const mockId = faker.string.uuid();
+      (selectionRepository.createNew as jest.Mock).mockResolvedValueOnce(
+        mockId
+      );
+      const selectionService = new SelectionService(selectionRepository);
 
       const mockSelection = getMockSelection({ useCleanText: false });
 
@@ -80,31 +58,13 @@ describe('Selection Service', () => {
   });
 
   describe('retrieve', () => {
-    it.each([[null], ['////'], [1], [{}], [true]])(
-      'should fail with invalid selection id',
-      async (failtyId) => {
-        const mockSelectionRepository = new SelectionRepository(
-          {} as Sequelize
-        );
-        jest
-          .spyOn(mockSelectionRepository, 'retrieveSelection')
-          .mockImplementationOnce(async (_: string) => getMockSelection());
-
-        const selectionService = new SelectionService(mockSelectionRepository);
-        expect(() =>
-          selectionService.retrieveSelection(failtyId as string)
-        ).rejects.toThrow('Could not retrieve selection');
-      }
-    );
-
     it('should resolve with selection that does not exist', async () => {
       const ghostSelection = crypto.randomUUID();
-      const mockSelectionRepository = new SelectionRepository({} as Sequelize);
-      jest
-        .spyOn(mockSelectionRepository, 'retrieveSelection')
-        .mockResolvedValueOnce(null);
+      (
+        selectionRepository.retrieveSelection as jest.Mock
+      ).mockResolvedValueOnce(null);
 
-      const selectionService = new SelectionService(mockSelectionRepository);
+      const selectionService = new SelectionService(selectionRepository);
 
       expect(selectionService.retrieveSelection(ghostSelection)).resolves.toBe(
         null
@@ -114,12 +74,11 @@ describe('Selection Service', () => {
     it('should retrieve the selection', async () => {
       const selectionId = crypto.randomUUID();
       const mockSelection = getMockSelection();
-      const mockSelectionRepository = new SelectionRepository({} as Sequelize);
-      jest
-        .spyOn(mockSelectionRepository, 'retrieveSelection')
-        .mockResolvedValueOnce(mockSelection);
+      (
+        selectionRepository.retrieveSelection as jest.Mock
+      ).mockResolvedValueOnce(mockSelection);
 
-      const selectionService = new SelectionService(mockSelectionRepository);
+      const selectionService = new SelectionService(selectionRepository);
       const result = await selectionService.retrieveSelection(selectionId);
 
       expect(result).toBe(mockSelection);
@@ -127,31 +86,13 @@ describe('Selection Service', () => {
   });
 
   describe('delete', () => {
-    it.each([[null], ['////'], [1], [{}], [true]])(
-      'should fail with invalid selection id',
-      async (failtyId) => {
-        const mockSelectionRepository = new SelectionRepository(
-          {} as Sequelize
-        );
-        jest
-          .spyOn(mockSelectionRepository, 'deleteSelection')
-          .mockRejectedValueOnce(async (_: string) => getMockSelection());
-
-        const selectionService = new SelectionService(mockSelectionRepository);
-        expect(() =>
-          selectionService.deleteSelection(failtyId as string)
-        ).rejects.toThrow('Could not delete selection');
-      }
-    );
-
     it('should resolve with selection that does not exist', async () => {
       const selectionId = crypto.randomUUID();
-      const mockSelectionRepository = new SelectionRepository({} as Sequelize);
-      jest
-        .spyOn(mockSelectionRepository, 'deleteSelection')
-        .mockResolvedValueOnce(false);
+      (selectionRepository.deleteSelection as jest.Mock).mockResolvedValueOnce(
+        false
+      );
 
-      const selectionService = new SelectionService(mockSelectionRepository);
+      const selectionService = new SelectionService(selectionRepository);
       expect(selectionService.deleteSelection(selectionId)).resolves.toBe(
         false
       );
@@ -159,12 +100,11 @@ describe('Selection Service', () => {
 
     it('should delete the selection', async () => {
       const selectionId = crypto.randomUUID();
-      const mockSelectionRepository = new SelectionRepository({} as Sequelize);
-      jest
-        .spyOn(mockSelectionRepository, 'deleteSelection')
-        .mockResolvedValueOnce(true);
+      (selectionRepository.deleteSelection as jest.Mock).mockResolvedValueOnce(
+        true
+      );
 
-      const selectionService = new SelectionService(mockSelectionRepository);
+      const selectionService = new SelectionService(selectionRepository);
       expect(selectionService.deleteSelection(selectionId)).resolves.toBe(true);
     });
   });
