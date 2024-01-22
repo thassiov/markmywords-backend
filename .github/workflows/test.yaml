@@ -14,6 +14,4 @@ jobs:
         with:
           node-version: '20.x'
       - run: npm install
-      - run: npm test
-      - name: 'Run coverage'
-        uses: ArtiomTr/jest-coverage-report-action@v2
+      - run: npm run test:ci

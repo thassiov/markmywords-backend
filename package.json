@@ -15,7 +15,7 @@
     "start": "ts-node ./src/index.ts",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:ci": "npm test --collectCoverage"
+    "test:ci": "npm run test -- --collect-coverage"
   },
   "keywords": [],
   "author": {
