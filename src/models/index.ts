@@ -1,3 +1,5 @@
+import { DatabaseInstanceError } from '../utils/errors';
+import { logger } from '../utils/logger';
 import { db } from './db';
 import {
   SelectionModel,
@@ -8,9 +10,16 @@ import {
   SelectionDto,
 } from './selection';
 
-(async () => {
-  await db.sync();
-})();
+async function syncDb(): Promise<void> {
+  try {
+    logger.info('Syncing models to the database');
+    await db.sync();
+  } catch (error) {
+    throw new DatabaseInstanceError('Could not sync models to the database', {
+      cause: error as Error,
+    });
+  }
+}
 
 export {
   SelectionModel,
@@ -19,4 +28,5 @@ export {
   IGetSelectionDto,
   ISelection,
   SelectionDto,
+  syncDb,
 };
