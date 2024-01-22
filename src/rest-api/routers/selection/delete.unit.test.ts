@@ -1,55 +1,51 @@
-import { getMockReq, getMockRes } from '@jest-mock/express';
 import { randomUUID } from 'crypto';
 import { StatusCodes } from 'http-status-codes';
+import { getMockReq, getMockRes } from '@jest-mock/express';
 
 import { selectionService } from '../../../services';
-import { getMockSelection } from '../../../utils/tests/mocks/selection';
-import { retrieveSelectionHandler } from './retrieve';
+import { deleteSelectionHandler } from './delete';
 
 jest.mock('../../../services');
 
-describe('REST: selection retrieveSelectionHandler', () => {
-  it('should retrieve a selection by its id', async () => {
-    const mockSelection = getMockSelection();
-    (selectionService.retrieveSelection as jest.Mock).mockResolvedValueOnce(
-      mockSelection
-    );
+describe('REST: selection deleteSelectionHandler', () => {
+  it('should delete a selection by its id', async () => {
+    (selectionService.deleteSelection as jest.Mock).mockResolvedValueOnce(true);
 
     const mockReq = getMockReq({
       params: { id: randomUUID() },
     });
     const mockRes = getMockRes().res;
 
-    await retrieveSelectionHandler(mockReq, mockRes);
+    await deleteSelectionHandler(mockReq, mockRes);
 
-    expect(mockRes.json).toHaveBeenCalledWith({ selection: mockSelection });
+    expect(mockRes.status).toHaveBeenCalledWith(StatusCodes.NO_CONTENT);
+    expect(mockRes.send).toHaveBeenCalledWith();
   });
 
-  it('should fail by trying to retrieve a selection that does not exist', async () => {
+  it('should fail to delete a section', async () => {
     (selectionService.retrieveSelection as jest.Mock).mockResolvedValueOnce(
-      null
+      false
     );
 
     const mockId = randomUUID();
-
     const mockReq = getMockReq({
       params: { id: mockId },
     });
     const mockRes = getMockRes().res;
 
-    await retrieveSelectionHandler(mockReq, mockRes);
+    await deleteSelectionHandler(mockReq, mockRes);
 
-    expect(mockRes.status).toHaveBeenCalledWith(StatusCodes.NOT_FOUND);
+    expect(mockRes.status).toHaveBeenCalledWith(
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
     expect(mockRes.json).toHaveBeenCalledWith({
-      message: 'Selection was not found',
+      message: 'Selection was not deleted',
       selectionId: mockId,
     });
   });
 
   it('should fail by providing a selection id with invalid format', async () => {
-    (selectionService.retrieveSelection as jest.Mock).mockResolvedValueOnce(
-      null
-    );
+    (selectionService.deleteSelection as jest.Mock).mockResolvedValueOnce(null);
 
     const mockId = 'invalidid';
 
@@ -58,7 +54,7 @@ describe('REST: selection retrieveSelectionHandler', () => {
     });
     const mockRes = getMockRes().res;
 
-    await retrieveSelectionHandler(mockReq, mockRes);
+    await deleteSelectionHandler(mockReq, mockRes);
 
     expect(mockRes.status).toHaveBeenCalledWith(StatusCodes.BAD_REQUEST);
     expect(mockRes.json).toHaveBeenCalledWith({
