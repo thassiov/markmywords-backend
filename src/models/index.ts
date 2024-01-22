@@ -2,12 +2,12 @@ import { DatabaseInstanceError } from '../utils/errors';
 import { logger } from '../utils/logger';
 import { db } from './db';
 import {
-  SelectionModel,
-  selectionSchema,
-  getSelectionDtoSchema,
   IGetSelectionDto,
   ISelection,
   SelectionDto,
+  SelectionModel,
+  getSelectionDtoSchema,
+  selectionSchema,
 } from './selection';
 
 async function syncDb(): Promise<void> {

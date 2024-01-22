@@ -1,9 +1,9 @@
 import { getMockReq, getMockRes } from '@jest-mock/express';
+import { StatusCodes } from 'http-status-codes';
 
-import { createNewHandler } from './createNew';
 import { selectionService } from '../../../services';
 import { getMockSelection } from '../../../utils/tests/mocks/selection';
-import { StatusCodes } from 'http-status-codes';
+import { createNewHandler } from './createNew';
 
 jest.mock('../../../services');
 

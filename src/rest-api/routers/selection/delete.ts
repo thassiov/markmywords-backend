@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
-import { EndpointHandlerError } from '../../../utils/errors';
-import { z } from 'zod';
 import { StatusCodes } from 'http-status-codes';
+import { z } from 'zod';
+
 import { selectionService } from '../../../services';
+import { EndpointHandlerError } from '../../../utils/errors';
 
 const selectionIdSchema = z.string().uuid();
 

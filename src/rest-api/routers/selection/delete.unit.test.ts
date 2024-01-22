@@ -1,6 +1,6 @@
+import { getMockReq, getMockRes } from '@jest-mock/express';
 import { randomUUID } from 'crypto';
 import { StatusCodes } from 'http-status-codes';
-import { getMockReq, getMockRes } from '@jest-mock/express';
 
 import { selectionService } from '../../../services';
 import { deleteSelectionHandler } from './delete';

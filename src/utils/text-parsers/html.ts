@@ -1,4 +1,5 @@
 import { convert } from 'html-to-text';
+
 import { SelectionDataConversionError } from '../errors';
 
 function htmlToPlainText(htmlString: string): string {

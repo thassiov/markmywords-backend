@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+
 import {
   SelectionDto,
   createSelectionDtoSchema,
 } from '../../../models/selection';
-import { EndpointHandlerError } from '../../../utils/errors';
 import { selectionService } from '../../../services';
+import { EndpointHandlerError } from '../../../utils/errors';
 
 async function createNewHandler(req: Request, res: Response): Promise<void> {
   try {

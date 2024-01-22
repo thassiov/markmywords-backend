@@ -1,13 +1,13 @@
 import { faker } from '@faker-js/faker';
 
-import { ICreateSelectionDto } from '../../models/selection';
 import { SelectionService } from '.';
+import { ICreateSelectionDto } from '../../models/selection';
+import { selectionRepository } from '../../repositories';
 import {
   getMockSelection,
   selections,
 } from '../../utils/tests/mocks/selection';
 import { htmlToPlainText } from '../../utils/text-parsers';
-import { selectionRepository } from '../../repositories';
 
 jest.mock('../../repositories/selection');
 

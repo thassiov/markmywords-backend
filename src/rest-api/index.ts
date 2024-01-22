@@ -1,11 +1,11 @@
+import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
-import cors from 'cors';
 import pinoHttp from 'pino-http';
 
-import { router } from './routers';
 import { configs } from '../utils/configs';
 import { logger } from '../utils/logger';
+import { router } from './routers';
 
 const api = express();
 

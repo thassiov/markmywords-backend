@@ -1,5 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import { z } from 'zod';
+
 import { db } from '../db';
 
 class SelectionModel extends Model {}

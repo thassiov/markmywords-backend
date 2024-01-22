@@ -1,6 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import { logger } from '../../utils/logger';
+import { NextFunction, Request, Response } from 'express';
+
 import { configs } from '../../utils/configs';
+import { logger } from '../../utils/logger';
 
 function errorHandler(
   err: Error,

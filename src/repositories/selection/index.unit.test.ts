@@ -1,4 +1,5 @@
 import { Sequelize, Transaction } from 'sequelize';
+
 import { SelectionRepository } from '.';
 import { SelectionModel } from '../../models';
 import { getMockSelection } from '../../utils/tests/mocks/selection';
