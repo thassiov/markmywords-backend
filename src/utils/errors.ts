@@ -18,6 +18,9 @@ export class CustomError extends Error {
 
       if (opts.cause) {
         this.cause = opts.cause;
+        if (opts.cause.message) {
+          this.message += `: ${opts.cause.message}`;
+        }
       }
     }
   }
@@ -41,4 +44,12 @@ export class DatabaseInstanceError extends CustomError {
 
 export class EndpointHandlerError extends CustomError {
   name = 'EndpointHandlerError';
+}
+
+export class ValidationError extends CustomError {
+  name = 'ValidationError';
+}
+
+export enum ErrorMessages {
+  CREATE_ACCOUNT_INVALID_ACCOUNT_INFO = 'Account information is invalid',
 }

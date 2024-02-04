@@ -1,10 +1,17 @@
-import { z } from 'zod';
+import {
+  IAccount,
+  ICreateAccounAndProfileDto,
+  ICreateAccountDto,
+  accountSchema,
+  createAccountAndProfileDtoSchema,
+  createAccountDtoSchema,
+} from './account';
 
-const accountSchema = z.object({
-  id: z.string().uuid(),
-  email: z.string().email(),
-});
-
-type IAccount = z.infer<typeof accountSchema>;
-
-export { IAccount, accountSchema };
+export {
+  IAccount,
+  accountSchema,
+  ICreateAccountDto,
+  createAccountDtoSchema,
+  createAccountAndProfileDtoSchema,
+  ICreateAccounAndProfileDto,
+};

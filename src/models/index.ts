@@ -1,8 +1,20 @@
 import { DatabaseInstanceError } from '../utils/errors';
 import { logger } from '../utils/logger';
-import { IAccount, accountSchema } from './account';
+import {
+  IAccount,
+  ICreateAccounAndProfileDto,
+  ICreateAccountDto,
+  accountSchema,
+  createAccountAndProfileDtoSchema,
+  createAccountDtoSchema,
+} from './account';
 import { db } from './db';
-import { IProfile, profileSchema } from './profile';
+import {
+  ICreateProfileDto,
+  IProfile,
+  createProfileDto,
+  profileSchema,
+} from './profile';
 import {
   IGetSelectionDto,
   ISelection,
@@ -35,4 +47,10 @@ export {
   profileSchema,
   IAccount,
   accountSchema,
+  createAccountDtoSchema,
+  ICreateAccountDto,
+  createAccountAndProfileDtoSchema,
+  ICreateAccounAndProfileDto,
+  ICreateProfileDto,
+  createProfileDto,
 };

@@ -1,11 +1,8 @@
-import { z } from 'zod';
+import {
+  ICreateProfileDto,
+  IProfile,
+  createProfileDto,
+  profileSchema,
+} from './profile';
 
-const profileSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string().min(1),
-  handle: z.string().min(4),
-});
-
-type IProfile = z.infer<typeof profileSchema>;
-
-export { IProfile, profileSchema };
+export { IProfile, profileSchema, ICreateProfileDto, createProfileDto };
