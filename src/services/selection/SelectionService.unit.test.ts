@@ -2,14 +2,12 @@ import { faker } from '@faker-js/faker';
 
 import { SelectionService } from '.';
 import { ICreateSelectionDto } from '../../models/selection';
-import { selectionRepository } from '../../repositories';
+import { SelectionRepository } from '../../repositories/selection';
 import {
   getMockSelection,
   selections,
 } from '../../utils/tests/mocks/selection';
 import { htmlToPlainText } from '../../utils/text-parsers';
-
-jest.mock('../../repositories/selection');
 
 jest.mock('../../utils/text-parsers', () => {
   return {
@@ -18,6 +16,12 @@ jest.mock('../../utils/text-parsers', () => {
 });
 
 describe('Selection Service', () => {
+  const mockSelectionRepository = {
+    create: jest.fn(),
+    retrieve: jest.fn(),
+    remove: jest.fn(),
+  };
+
   afterAll(() => {
     jest.resetAllMocks();
     jest.clearAllMocks();
@@ -26,10 +30,12 @@ describe('Selection Service', () => {
   describe('create', () => {
     it('should create a new selection', async () => {
       const mockId = faker.string.uuid();
-      (selectionRepository.createNew as jest.Mock).mockResolvedValueOnce(
+      (mockSelectionRepository.create as jest.Mock).mockResolvedValueOnce(
         mockId
       );
-      const selectionService = new SelectionService(selectionRepository);
+      const selectionService = new SelectionService(
+        mockSelectionRepository as any as SelectionRepository
+      );
       const mockSelection = getMockSelection();
 
       const id = await selectionService.createNew(
@@ -41,10 +47,12 @@ describe('Selection Service', () => {
 
     it('should create a selection and the text must be stripped of html tags', async () => {
       const mockId = faker.string.uuid();
-      (selectionRepository.createNew as jest.Mock).mockResolvedValueOnce(
+      (mockSelectionRepository.create as jest.Mock).mockResolvedValueOnce(
         mockId
       );
-      const selectionService = new SelectionService(selectionRepository);
+      const selectionService = new SelectionService(
+        mockSelectionRepository as any as SelectionRepository
+      );
 
       const mockSelection = getMockSelection({ useCleanText: false });
 
@@ -60,26 +68,28 @@ describe('Selection Service', () => {
   describe('retrieve', () => {
     it('should resolve with selection that does not exist', async () => {
       const ghostSelection = crypto.randomUUID();
-      (
-        selectionRepository.retrieveSelection as jest.Mock
-      ).mockResolvedValueOnce(null);
-
-      const selectionService = new SelectionService(selectionRepository);
-
-      expect(selectionService.retrieveSelection(ghostSelection)).resolves.toBe(
+      (mockSelectionRepository.retrieve as jest.Mock).mockResolvedValueOnce(
         null
       );
+
+      const selectionService = new SelectionService(
+        mockSelectionRepository as any as SelectionRepository
+      );
+
+      expect(selectionService.retrieve(ghostSelection)).resolves.toBe(null);
     });
 
     it('should retrieve the selection', async () => {
       const selectionId = crypto.randomUUID();
       const mockSelection = getMockSelection();
-      (
-        selectionRepository.retrieveSelection as jest.Mock
-      ).mockResolvedValueOnce(mockSelection);
+      (mockSelectionRepository.retrieve as jest.Mock).mockResolvedValueOnce(
+        mockSelection
+      );
 
-      const selectionService = new SelectionService(selectionRepository);
-      const result = await selectionService.retrieveSelection(selectionId);
+      const selectionService = new SelectionService(
+        mockSelectionRepository as any as SelectionRepository
+      );
+      const result = await selectionService.retrieve(selectionId);
 
       expect(result).toBe(mockSelection);
     });
@@ -88,24 +98,24 @@ describe('Selection Service', () => {
   describe('delete', () => {
     it('should resolve with selection that does not exist', async () => {
       const selectionId = crypto.randomUUID();
-      (selectionRepository.deleteSelection as jest.Mock).mockResolvedValueOnce(
+      (mockSelectionRepository.remove as jest.Mock).mockResolvedValueOnce(
         false
       );
 
-      const selectionService = new SelectionService(selectionRepository);
-      expect(selectionService.deleteSelection(selectionId)).resolves.toBe(
-        false
+      const selectionService = new SelectionService(
+        mockSelectionRepository as any as SelectionRepository
       );
+      expect(selectionService.remove(selectionId)).resolves.toBe(false);
     });
 
     it('should delete the selection', async () => {
       const selectionId = crypto.randomUUID();
-      (selectionRepository.deleteSelection as jest.Mock).mockResolvedValueOnce(
-        true
-      );
+      (mockSelectionRepository.remove as jest.Mock).mockResolvedValueOnce(true);
 
-      const selectionService = new SelectionService(selectionRepository);
-      expect(selectionService.deleteSelection(selectionId)).resolves.toBe(true);
+      const selectionService = new SelectionService(
+        mockSelectionRepository as any as SelectionRepository
+      );
+      expect(selectionService.remove(selectionId)).resolves.toBe(true);
     });
   });
 });

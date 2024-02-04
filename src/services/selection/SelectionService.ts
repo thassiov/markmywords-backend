@@ -9,7 +9,7 @@ class SelectionService {
   async createNew(selectionDto: ICreateSelectionDto): Promise<string> {
     try {
       selectionDto.text = htmlToPlainText(selectionDto.rawText);
-      const selectionId = await this.repository.createNew(selectionDto);
+      const selectionId = await this.repository.create(selectionDto);
       return selectionId;
     } catch (error) {
       throw new ServiceError('Could not create new selection', {
@@ -22,11 +22,9 @@ class SelectionService {
     }
   }
 
-  async retrieveSelection(
-    selectionId: string
-  ): Promise<IGetSelectionDto | null> {
+  async retrieve(selectionId: string): Promise<IGetSelectionDto | null> {
     try {
-      const selection = await this.repository.retrieveSelection(selectionId);
+      const selection = await this.repository.retrieve(selectionId);
 
       if (!selection) {
         // @NOTE maybe log here
@@ -45,9 +43,9 @@ class SelectionService {
     }
   }
 
-  async deleteSelection(selectionId: string): Promise<boolean> {
+  async remove(selectionId: string): Promise<boolean> {
     try {
-      const result = await this.repository.deleteSelection(selectionId);
+      const result = await this.repository.remove(selectionId);
 
       if (!result) {
         return false;

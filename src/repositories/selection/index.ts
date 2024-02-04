@@ -14,7 +14,7 @@ class SelectionRepository {
     this.db = this.sequelize.model('selection');
   }
 
-  async createNew(selection: ICreateSelectionDto): Promise<string> {
+  async create(selection: ICreateSelectionDto): Promise<string> {
     const transaction = await this.getTransaction();
     try {
       const selectionData = SelectionDto.createSelectionDtoToModel(selection);
@@ -33,9 +33,7 @@ class SelectionRepository {
     }
   }
 
-  async retrieveSelection(
-    selectionId: string
-  ): Promise<IGetSelectionDto | null> {
+  async retrieve(selectionId: string): Promise<IGetSelectionDto | null> {
     try {
       const selection = await this.db.findOne({
         where: {
@@ -61,7 +59,7 @@ class SelectionRepository {
     }
   }
 
-  async deleteSelection(selectionId: string): Promise<boolean> {
+  async remove(selectionId: string): Promise<boolean> {
     const transaction = await this.getTransaction();
 
     try {

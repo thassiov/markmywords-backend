@@ -32,7 +32,7 @@ describe('Selection Repository', () => {
 
       const selectionRepository = new SelectionRepository(sequelize);
 
-      const result = await selectionRepository.createNew(mockSelection);
+      const result = await selectionRepository.create(mockSelection);
 
       expect(result).toBe('fakeid');
     });
@@ -52,7 +52,7 @@ describe('Selection Repository', () => {
 
       const selectionRepository = new SelectionRepository(sequelize);
 
-      const result = await selectionRepository.retrieveSelection('someid');
+      const result = await selectionRepository.retrieve('someid');
 
       expect(result).toEqual(mockSelection);
     });
@@ -66,7 +66,7 @@ describe('Selection Repository', () => {
 
       const selectionRepository = new SelectionRepository(sequelize);
 
-      const result = await selectionRepository.retrieveSelection('someid');
+      const result = await selectionRepository.retrieve('someid');
 
       expect(result).toEqual(null);
     });
@@ -87,7 +87,7 @@ describe('Selection Repository', () => {
 
       const selectionRepository = new SelectionRepository(sequelize);
 
-      const result = await selectionRepository.deleteSelection('someid');
+      const result = await selectionRepository.remove('someid');
 
       expect(result).toBe(true);
     });
@@ -106,7 +106,7 @@ describe('Selection Repository', () => {
 
       const selectionRepository = new SelectionRepository(sequelize);
 
-      const result = await selectionRepository.deleteSelection('someid');
+      const result = await selectionRepository.remove('someid');
 
       expect(result).toBe(false);
     });
