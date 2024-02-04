@@ -52,4 +52,6 @@ export class ValidationError extends CustomError {
 
 export enum ErrorMessages {
   CREATE_ACCOUNT_INVALID_ACCOUNT_INFO = 'Account information is invalid',
+  CREATE_ACCOUNT_EMAIL_ALREADY_IN_USE = 'Email already in use',
+  CREATE_ACCOUNT_USERHANDLE_ALREADY_IN_USE = 'User handle already in use',
 }

@@ -8,6 +8,7 @@ class AccountRepository {
   constructor(private readonly sequelize: Sequelize) {
     //   this.db = this.sequelize.model('selection');
   }
+
   async create(accountDto: ICreateAccountDto): Promise<string> {
     const transaction = await this.getTransaction();
     try {
