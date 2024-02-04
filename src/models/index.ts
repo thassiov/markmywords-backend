@@ -1,6 +1,8 @@
 import { DatabaseInstanceError } from '../utils/errors';
 import { logger } from '../utils/logger';
+import { IAccount, accountSchema } from './account';
 import { db } from './db';
+import { IProfile, profileSchema } from './profile';
 import {
   IGetSelectionDto,
   ISelection,
@@ -29,4 +31,8 @@ export {
   ISelection,
   SelectionDto,
   syncDb,
+  IProfile,
+  profileSchema,
+  IAccount,
+  accountSchema,
 };
