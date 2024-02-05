@@ -1,5 +1,9 @@
 import { createNewHandler } from './createNew';
 import { deleteSelectionHandler } from './delete';
-import { retrieveSelectionHandler } from './retrieve';
+import { retrieveSelectionHandlerFactory } from './retrieve';
 
-export { createNewHandler, retrieveSelectionHandler, deleteSelectionHandler };
+export {
+  createNewHandler,
+  retrieveSelectionHandlerFactory,
+  deleteSelectionHandler,
+};

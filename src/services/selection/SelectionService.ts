@@ -6,7 +6,7 @@ import { htmlToPlainText } from '../../utils/text-parsers';
 class SelectionService {
   constructor(private readonly repository: SelectionRepository) {}
 
-  async createNew(selectionDto: ICreateSelectionDto): Promise<string> {
+  async create(selectionDto: ICreateSelectionDto): Promise<string> {
     try {
       selectionDto.text = htmlToPlainText(selectionDto.rawText);
       const selectionId = await this.repository.create(selectionDto);

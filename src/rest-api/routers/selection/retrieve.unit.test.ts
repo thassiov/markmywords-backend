@@ -2,16 +2,22 @@ import { getMockReq, getMockRes } from '@jest-mock/express';
 import { randomUUID } from 'crypto';
 import { StatusCodes } from 'http-status-codes';
 
-import { selectionService } from '../../../services';
+import { SelectionService } from '../../../services';
 import { getMockSelection } from '../../../utils/tests/mocks/selection';
-import { retrieveSelectionHandler } from './retrieve';
-
-jest.mock('../../../services');
+import { retrieveSelectionHandlerFactory } from './retrieve';
 
 describe('REST: selection retrieveSelectionHandler', () => {
+  const mockSelectionService = {
+    retrieve: jest.fn(),
+  };
+
   it('should retrieve a selection by its id', async () => {
     const mockSelection = getMockSelection();
-    (selectionService.retrieveSelection as jest.Mock).mockResolvedValueOnce(
+    const retrieveSelectionHandler = retrieveSelectionHandlerFactory(
+      mockSelectionService as any as SelectionService
+    );
+
+    (mockSelectionService.retrieve as jest.Mock).mockResolvedValueOnce(
       mockSelection
     );
 
@@ -26,9 +32,11 @@ describe('REST: selection retrieveSelectionHandler', () => {
   });
 
   it('should fail by trying to retrieve a selection that does not exist', async () => {
-    (selectionService.retrieveSelection as jest.Mock).mockResolvedValueOnce(
-      null
+    const retrieveSelectionHandler = retrieveSelectionHandlerFactory(
+      mockSelectionService as any as SelectionService
     );
+
+    (mockSelectionService.retrieve as jest.Mock).mockResolvedValueOnce(null);
 
     const mockId = randomUUID();
 
@@ -47,9 +55,11 @@ describe('REST: selection retrieveSelectionHandler', () => {
   });
 
   it('should fail by providing a selection id with invalid format', async () => {
-    (selectionService.retrieveSelection as jest.Mock).mockResolvedValueOnce(
-      null
+    const retrieveSelectionHandler = retrieveSelectionHandlerFactory(
+      mockSelectionService as any as SelectionService
     );
+
+    (mockSelectionService.retrieve as jest.Mock).mockResolvedValueOnce(null);
 
     const mockId = 'invalidid';
 

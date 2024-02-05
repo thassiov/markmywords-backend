@@ -2,14 +2,19 @@ import { getMockReq, getMockRes } from '@jest-mock/express';
 import { randomUUID } from 'crypto';
 import { StatusCodes } from 'http-status-codes';
 
-import { selectionService } from '../../../services';
-import { deleteSelectionHandler } from './delete';
-
-jest.mock('../../../services');
+import { SelectionService } from '../../../services';
+import { deleteSelectionHandlerFactory } from './delete';
 
 describe('REST: selection deleteSelectionHandler', () => {
+  const mockSelectionService = {
+    remove: jest.fn(),
+  };
+
   it('should delete a selection by its id', async () => {
-    (selectionService.deleteSelection as jest.Mock).mockResolvedValueOnce(true);
+    const deleteSelectionHandler = deleteSelectionHandlerFactory(
+      mockSelectionService as any as SelectionService
+    );
+    (mockSelectionService.remove as jest.Mock).mockResolvedValueOnce(true);
 
     const mockReq = getMockReq({
       params: { id: randomUUID() },
@@ -23,9 +28,11 @@ describe('REST: selection deleteSelectionHandler', () => {
   });
 
   it('should fail to delete a section', async () => {
-    (selectionService.retrieveSelection as jest.Mock).mockResolvedValueOnce(
-      false
+    const deleteSelectionHandler = deleteSelectionHandlerFactory(
+      mockSelectionService as any as SelectionService
     );
+
+    (mockSelectionService.remove as jest.Mock).mockResolvedValueOnce(false);
 
     const mockId = randomUUID();
     const mockReq = getMockReq({
@@ -45,7 +52,11 @@ describe('REST: selection deleteSelectionHandler', () => {
   });
 
   it('should fail by providing a selection id with invalid format', async () => {
-    (selectionService.deleteSelection as jest.Mock).mockResolvedValueOnce(null);
+    const deleteSelectionHandler = deleteSelectionHandlerFactory(
+      mockSelectionService as any as SelectionService
+    );
+
+    (mockSelectionService.remove as jest.Mock).mockResolvedValueOnce(null);
 
     const mockId = 'invalidid';
 

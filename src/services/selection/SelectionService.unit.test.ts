@@ -38,7 +38,7 @@ describe('Selection Service', () => {
       );
       const mockSelection = getMockSelection();
 
-      const id = await selectionService.createNew(
+      const id = await selectionService.create(
         mockSelection as ICreateSelectionDto
       );
 
@@ -56,7 +56,7 @@ describe('Selection Service', () => {
 
       const mockSelection = getMockSelection({ useCleanText: false });
 
-      const id = await selectionService.createNew(
+      const id = await selectionService.create(
         mockSelection as ICreateSelectionDto
       );
 
