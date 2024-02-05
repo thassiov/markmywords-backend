@@ -5,19 +5,23 @@ import pinoHttp from 'pino-http';
 
 import { configs } from '../utils/configs';
 import { logger } from '../utils/logger';
-import { router } from './routers';
+import { Services } from '../utils/types';
+import { setupRouter } from './routers';
 
 const api = express();
 
-// @TODO enable compression
-api.use(express.json({ limit: '100kb' }));
-api.use(express.urlencoded({ limit: '100kb' }));
-api.use(pinoHttp());
-api.use(cors());
-api.use(helmet());
-api.use(router);
+function startApi(services: Services) {
+  // @TODO enable compression
+  api.use(express.json({ limit: '100kb' }));
+  api.use(express.urlencoded({ limit: '100kb' }));
+  api.use(pinoHttp());
+  api.use(cors());
+  api.use(helmet());
 
-function startApi() {
+  const router = setupRouter(services);
+
+  api.use('/v1', router);
+
   api.listen(configs.apiPort, () =>
     logger.info(`Server started at http://0.0.0.0:${configs.apiPort}`)
   );

@@ -1,18 +1,29 @@
-import express from 'express';
+import express, { Router } from 'express';
 
+import { Services } from '../../utils/types';
 import {
-  createNewHandler,
-  deleteSelectionHandler,
-  retrieveSelectionHandler,
+  createSelectionHandlerFactory,
+  deleteSelectionHandlerFactory,
+  retrieveSelectionHandlerFactory,
 } from './selection';
 
 const router = express.Router();
 
-router.use('/v1');
+function setupRouter(services: Services): Router {
+  router.use('/v1');
 
-// @TODO will require 'is authenticated' middleware
-router.post('/selections', createNewHandler);
-router.get('/selections/:id', retrieveSelectionHandler);
-router.delete('/selections/:id', deleteSelectionHandler);
+  // @TODO will require 'is authenticated' middleware
+  router.post('/selections', createSelectionHandlerFactory(services.selection));
+  router.get(
+    '/selections/:id',
+    retrieveSelectionHandlerFactory(services.selection)
+  );
+  router.delete(
+    '/selections/:id',
+    deleteSelectionHandlerFactory(services.selection)
+  );
 
-export { router };
+  return router;
+}
+
+export { setupRouter };
