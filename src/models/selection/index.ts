@@ -7,7 +7,7 @@ import {
   createSelectionDtoSchema,
   getSelectionDtoSchema,
   selectionSchema,
-} from './SelectionRepository';
+} from './selection';
 
 export {
   SelectionModel,
