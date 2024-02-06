@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { SelectionService } from '../../../services';
 import { getMockSelection } from '../../../utils/tests/mocks/selection';
-import { createSelectionHandlerFactory } from './createNew';
+import { createSelectionHandlerFactory } from './create';
 
 describe('REST: selection createNewHandler', () => {
   const mockSelectionService = {
