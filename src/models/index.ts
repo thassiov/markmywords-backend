@@ -1,6 +1,9 @@
+import { DataTypes } from 'sequelize';
+
 import { DatabaseInstanceError } from '../utils/errors';
 import { logger } from '../utils/logger';
 import {
+  AccountModel,
   IAccount,
   ICreateAccounAndProfileDto,
   ICreateAccountDto,
@@ -12,6 +15,7 @@ import { db } from './db';
 import {
   ICreateProfileDto,
   IProfile,
+  ProfileModel,
   createProfileDto,
   profileSchema,
 } from './profile';
@@ -23,6 +27,21 @@ import {
   getSelectionDtoSchema,
   selectionSchema,
 } from './selection';
+
+AccountModel.hasOne(ProfileModel, {
+  foreignKey: {
+    name: 'accountId',
+    allowNull: false,
+  },
+});
+ProfileModel.belongsTo(AccountModel);
+AccountModel.hasMany(SelectionModel, {
+  foreignKey: {
+    name: 'accountId',
+    allowNull: false,
+  },
+});
+SelectionModel.belongsTo(AccountModel);
 
 async function syncDb(): Promise<void> {
   try {

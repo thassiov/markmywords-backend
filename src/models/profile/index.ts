@@ -1,8 +1,15 @@
 import {
   ICreateProfileDto,
   IProfile,
+  ProfileModel,
   createProfileDto,
   profileSchema,
 } from './profile';
 
-export { IProfile, profileSchema, ICreateProfileDto, createProfileDto };
+export {
+  ProfileModel,
+  IProfile,
+  profileSchema,
+  ICreateProfileDto,
+  createProfileDto,
+};

@@ -1,4 +1,5 @@
 import {
+  AccountModel,
   IAccount,
   ICreateAccounAndProfileDto,
   ICreateAccountDto,
@@ -8,6 +9,7 @@ import {
 } from './account';
 
 export {
+  AccountModel,
   IAccount,
   accountSchema,
   ICreateAccountDto,

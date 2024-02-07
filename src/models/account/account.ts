@@ -1,4 +1,29 @@
+import { DataTypes, Model } from 'sequelize';
 import { z } from 'zod';
+
+import { db } from '../db';
+
+class AccountModel extends Model {}
+
+AccountModel.init(
+  {
+    id: {
+      type: DataTypes.UUIDV4,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  {
+    sequelize: db,
+    modelName: 'account',
+    paranoid: true,
+  }
+);
 
 const accountSchema = z.object({
   id: z.string().uuid(),
@@ -24,6 +49,7 @@ type ICreateAccounAndProfileDto = z.infer<
 >;
 
 export {
+  AccountModel,
   IAccount,
   accountSchema,
   ICreateAccountDto,
