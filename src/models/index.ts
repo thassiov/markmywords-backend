@@ -1,5 +1,3 @@
-import { DataTypes } from 'sequelize';
-
 import { DatabaseInstanceError } from '../utils/errors';
 import { logger } from '../utils/logger';
 import {
@@ -11,6 +9,13 @@ import {
   createAccountAndProfileDtoSchema,
   createAccountDtoSchema,
 } from './account';
+import {
+  CommentModel,
+  IComment,
+  ICreateCommentDto,
+  commentSchema,
+  createCommentDtoSchema,
+} from './comment';
 import { db } from './db';
 import {
   ICreateProfileDto,
@@ -35,6 +40,7 @@ AccountModel.hasOne(ProfileModel, {
   },
 });
 ProfileModel.belongsTo(AccountModel);
+
 AccountModel.hasMany(SelectionModel, {
   foreignKey: {
     name: 'accountId',
@@ -42,6 +48,22 @@ AccountModel.hasMany(SelectionModel, {
   },
 });
 SelectionModel.belongsTo(AccountModel);
+
+AccountModel.hasMany(CommentModel, {
+  foreignKey: {
+    name: 'accountId',
+    allowNull: false,
+  },
+});
+CommentModel.belongsTo(AccountModel);
+
+SelectionModel.hasMany(CommentModel, {
+  foreignKey: {
+    name: 'selectionId',
+    allowNull: false,
+  },
+});
+CommentModel.belongsTo(SelectionModel);
 
 async function syncDb(): Promise<void> {
   try {
@@ -72,4 +94,9 @@ export {
   ICreateAccounAndProfileDto,
   ICreateProfileDto,
   createProfileDto,
+  CommentModel,
+  IComment,
+  ICreateCommentDto,
+  commentSchema,
+  createCommentDtoSchema,
 };

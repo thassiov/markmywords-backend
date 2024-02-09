@@ -50,8 +50,17 @@ export class ValidationError extends CustomError {
   name = 'ValidationError';
 }
 
+export class ApplicationError extends CustomError {
+  name = 'ApplicationError';
+}
+
 export enum ErrorMessages {
   CREATE_ACCOUNT_INVALID_ACCOUNT_INFO = 'Account information is invalid',
   CREATE_ACCOUNT_EMAIL_ALREADY_IN_USE = 'Email already in use',
   CREATE_ACCOUNT_USERHANDLE_ALREADY_IN_USE = 'User handle already in use',
+  SELECTION_NOT_FOUND = 'Selection not found',
+  ACCOUNT_NOT_FOUND = 'Account not found',
+  PROFILE_NOT_FOUND = 'Profile not found',
+  COMMENT_NOT_FOUND = 'Comment not found',
+  CREATE_COMMENT_BODY_NOT_DEFINED = "The comment's body is not defined",
 }
