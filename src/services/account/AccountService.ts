@@ -45,6 +45,20 @@ class AccountService {
       });
     }
   }
+
+  async remove(accountId: string): Promise<boolean> {
+    try {
+      return this.accRepository.remove(accountId);
+    } catch (error) {
+      throw new ServiceError('Could not remove', {
+        cause: error as Error,
+        details: {
+          service: 'account',
+          input: accountId,
+        },
+      });
+    }
+  }
 }
 
 export { AccountService };

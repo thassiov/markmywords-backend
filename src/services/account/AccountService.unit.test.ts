@@ -13,6 +13,7 @@ describe('account service', () => {
 
   const mockAccountRepository = {
     create: jest.fn(),
+    remove: jest.fn(),
   };
 
   const mockProfileRepository = {
@@ -90,5 +91,22 @@ describe('account service', () => {
         );
       }
     );
+  });
+
+  describe('remove', () => {
+    it('remove an existing account', async () => {
+      const mockAccountId = faker.string.uuid();
+
+      (mockAccountRepository.remove as jest.Mock).mockResolvedValueOnce(true);
+
+      const accountService = new AccountService(
+        mockAccountRepository as any as AccountRepository,
+        mockProfileRepository as any as ProfileRepository
+      );
+
+      const result = await accountService.remove(mockAccountId);
+
+      expect(result).toEqual(true);
+    });
   });
 });
