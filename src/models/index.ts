@@ -34,6 +34,7 @@ import {
 } from './selection';
 
 AccountModel.hasOne(ProfileModel, {
+  onDelete: 'CASCADE',
   foreignKey: {
     name: 'accountId',
     allowNull: false,
@@ -42,6 +43,7 @@ AccountModel.hasOne(ProfileModel, {
 ProfileModel.belongsTo(AccountModel);
 
 AccountModel.hasMany(SelectionModel, {
+  onDelete: 'CASCADE',
   foreignKey: {
     name: 'accountId',
     allowNull: false,
@@ -50,6 +52,7 @@ AccountModel.hasMany(SelectionModel, {
 SelectionModel.belongsTo(AccountModel);
 
 AccountModel.hasMany(CommentModel, {
+  onDelete: 'CASCADE',
   foreignKey: {
     name: 'accountId',
     allowNull: false,
@@ -58,6 +61,7 @@ AccountModel.hasMany(CommentModel, {
 CommentModel.belongsTo(AccountModel);
 
 SelectionModel.hasMany(CommentModel, {
+  onDelete: 'CASCADE',
   foreignKey: {
     name: 'selectionId',
     allowNull: false,
