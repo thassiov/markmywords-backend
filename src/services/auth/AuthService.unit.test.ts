@@ -1,12 +1,22 @@
 import bcryptjs from 'bcryptjs';
 import jsonwebtoken from 'jsonwebtoken';
 
+import { JWTTokenRepository } from '../../repositories/token';
 import { AuthService } from './AuthService';
 
 jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');
 
 describe('Auth Service', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.resetAllMocks();
+  });
+
+  const mockJWTTokenRepository = {
+    create: jest.fn(),
+  };
+
   describe('password operations', () => {
     describe('hashing', () => {
       it('should hash a given password', async () => {
@@ -16,7 +26,9 @@ describe('Auth Service', () => {
         (bcryptjs.genSalt as jest.Mock).mockResolvedValueOnce(mockSalt);
         (bcryptjs.hash as jest.Mock).mockResolvedValueOnce(mockHash);
 
-        const authService = new AuthService();
+        const authService = new AuthService(
+          mockJWTTokenRepository as any as JWTTokenRepository
+        );
 
         const result = await authService.hashPassword(mockPassword);
 
@@ -32,7 +44,9 @@ describe('Auth Service', () => {
         const mockHash = 'hash';
         (bcryptjs.compare as jest.Mock).mockResolvedValueOnce(true);
 
-        const authService = new AuthService();
+        const authService = new AuthService(
+          mockJWTTokenRepository as any as JWTTokenRepository
+        );
 
         const result = await authService.verifyPasswordHash(
           mockPassword,
@@ -48,12 +62,14 @@ describe('Auth Service', () => {
   describe('jwt token', () => {
     describe('access token', () => {
       it('should issue a new access token', () => {
-        const mockTokenPayload = { userId: 'thisuserexists' };
+        const mockTokenPayload = { accountId: 'thisuserexists' };
 
         const mockToken = 'token';
         (jsonwebtoken.sign as jest.Mock).mockReturnValueOnce(mockToken);
 
-        const authService = new AuthService();
+        const authService = new AuthService(
+          mockJWTTokenRepository as any as JWTTokenRepository
+        );
 
         const result = authService.issueAccessToken(mockTokenPayload);
 
@@ -61,14 +77,16 @@ describe('Auth Service', () => {
       });
 
       it('should verify a access token', () => {
-        const mockTokenPayload = { userId: 'thisuserexists' };
+        const mockTokenPayload = { accountId: 'thisuserexists' };
 
         const mockToken = 'token';
         (jsonwebtoken.verify as jest.Mock).mockReturnValueOnce(
           mockTokenPayload
         );
 
-        const authService = new AuthService();
+        const authService = new AuthService(
+          mockJWTTokenRepository as any as JWTTokenRepository
+        );
 
         const result = authService.verifyAccessToken(
           mockToken,
@@ -79,14 +97,16 @@ describe('Auth Service', () => {
       });
 
       it('catches an error when verifying a token with tampered payload', () => {
-        const mockTokenPayload = { userId: 'thisuserexists' };
+        const mockTokenPayload = { accountId: 'thisuserexists' };
 
         const mockToken = 'token';
         (jsonwebtoken.verify as jest.Mock).mockReturnValueOnce({
-          userId: 'thisuserdoesnotexist',
+          accountId: 'thisuserdoesnotexist',
         });
 
-        const authService = new AuthService();
+        const authService = new AuthService(
+          mockJWTTokenRepository as any as JWTTokenRepository
+        );
 
         expect(() =>
           authService.verifyAccessToken(mockToken, mockTokenPayload)
@@ -94,16 +114,41 @@ describe('Auth Service', () => {
           'Could not verify jwt token: Expected values to be strictly deep-equal'
         );
       });
+
+      it('should invalidate a given accessToken', async () => {
+        const mockAccountId = 'someid';
+        const mockTokenExpiration = 1234;
+        const mockToken = 'token';
+        const mockInvalidatedTokenId = 'invalidatedTokenRegisterId';
+        (mockJWTTokenRepository.create as jest.Mock).mockResolvedValueOnce(
+          mockInvalidatedTokenId
+        );
+
+        (jsonwebtoken.verify as jest.Mock).mockReturnValueOnce({
+          accountId: mockAccountId,
+          exp: mockTokenExpiration,
+        });
+
+        const authService = new AuthService(
+          mockJWTTokenRepository as any as JWTTokenRepository
+        );
+
+        const result = await authService.invalidateAccessToken(mockToken);
+
+        expect(result).toEqual(mockInvalidatedTokenId);
+      });
     });
 
     describe('refresh token', () => {
       it('should issue a new refresh token', () => {
-        const mockTokenPayload = { userId: 'thisuserexists' };
+        const mockTokenPayload = { accountId: 'thisuserexists' };
 
         const mockToken = 'token';
         (jsonwebtoken.sign as jest.Mock).mockReturnValueOnce(mockToken);
 
-        const authService = new AuthService();
+        const authService = new AuthService(
+          mockJWTTokenRepository as any as JWTTokenRepository
+        );
 
         const result = authService.issueRefreshToken(mockTokenPayload);
 
@@ -111,14 +156,16 @@ describe('Auth Service', () => {
       });
 
       it('should verify a refresh token', () => {
-        const mockTokenPayload = { userId: 'thisuserexists' };
+        const mockTokenPayload = { accountId: 'thisuserexists' };
 
         const mockToken = 'token';
         (jsonwebtoken.verify as jest.Mock).mockReturnValueOnce(
           mockTokenPayload
         );
 
-        const authService = new AuthService();
+        const authService = new AuthService(
+          mockJWTTokenRepository as any as JWTTokenRepository
+        );
 
         const result = authService.verifyRefreshToken(
           mockToken,
@@ -129,20 +176,45 @@ describe('Auth Service', () => {
       });
 
       it('catches an error when verifying a token with tampered payload', () => {
-        const mockTokenPayload = { userId: 'thisuserexists' };
+        const mockTokenPayload = { accountId: 'thisuserexists' };
 
         const mockToken = 'token';
         (jsonwebtoken.verify as jest.Mock).mockReturnValueOnce({
-          userId: 'thisuserdoesnotexist',
+          accountId: 'thisuserdoesnotexist',
         });
 
-        const authService = new AuthService();
+        const authService = new AuthService(
+          mockJWTTokenRepository as any as JWTTokenRepository
+        );
 
         expect(() =>
           authService.verifyRefreshToken(mockToken, mockTokenPayload)
         ).toThrow(
           'Could not verify jwt token: Expected values to be strictly deep-equal'
         );
+      });
+
+      it('should invalidate a given refreshToken', async () => {
+        const mockAccountId = 'someid';
+        const mockTokenExpiration = 1234;
+        const mockToken = 'token';
+        const mockInvalidatedTokenId = 'invalidatedTokenRegisterId';
+        (mockJWTTokenRepository.create as jest.Mock).mockResolvedValueOnce(
+          mockInvalidatedTokenId
+        );
+
+        (jsonwebtoken.verify as jest.Mock).mockReturnValueOnce({
+          accountId: mockAccountId,
+          exp: mockTokenExpiration,
+        });
+
+        const authService = new AuthService(
+          mockJWTTokenRepository as any as JWTTokenRepository
+        );
+
+        const result = await authService.invalidateRefreshToken(mockToken);
+
+        expect(result).toEqual(mockInvalidatedTokenId);
       });
     });
   });

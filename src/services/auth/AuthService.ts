@@ -2,14 +2,18 @@ import { compare, genSalt, hash } from 'bcryptjs';
 import { sign, verify } from 'jsonwebtoken';
 import { deepStrictEqual } from 'node:assert/strict';
 
+import { JWTTokenRepository } from '../../repositories/token';
 import { configs } from '../../utils/configs';
 import { ServiceError, ValidationError } from '../../utils/errors';
 
-// @NOTE I think I'll set it to 'userid: <string>, roles: [<string>]' later on
-type TokenPayload = { userId: string };
+// @NOTE I think I'll set it to 'accountId: <string>, roles: [<string>]' later on
+type TokenPayload = { accountId: string };
+type TokenType = 'access' | 'refresh';
 const JWT_ALGORITHM = 'RS256';
 
 class AuthService {
+  constructor(private readonly repository: JWTTokenRepository) {}
+
   async hashPassword(password: string): Promise<string> {
     try {
       const salt = await genSalt(configs.appAccountPasswordSaltGenRounds);
@@ -79,6 +83,28 @@ class AuthService {
     }
   }
 
+  async invalidateAccessToken(accessToken: string): Promise<string> {
+    try {
+      const secretOrPubKey =
+        configs.appJWTAccessTokenPublicKey || configs.appJWTAccessTokenSecret;
+
+      const tokenId = await this.invalidateJWTToken(
+        accessToken,
+        secretOrPubKey,
+        'access'
+      );
+
+      return tokenId;
+    } catch (error) {
+      throw new ServiceError('Error during access token invalidation', {
+        cause: error as Error,
+        details: {
+          service: 'auth',
+        },
+      });
+    }
+  }
+
   issueRefreshToken(payload: TokenPayload): string {
     try {
       const secretOrPrivKey =
@@ -105,6 +131,28 @@ class AuthService {
       return this.verifyJWTToken(refreshToken, payload, secretOrPubKey);
     } catch (error) {
       throw new ServiceError('Error during refresh token verification', {
+        cause: error as Error,
+        details: {
+          service: 'auth',
+        },
+      });
+    }
+  }
+
+  async invalidateRefreshToken(refreshToken: string): Promise<string> {
+    try {
+      const secretOrPubKey =
+        configs.appJWTRefreshTokenPublicKey || configs.appJWTRefreshTokenSecret;
+
+      const tokenId = await this.invalidateJWTToken(
+        refreshToken,
+        secretOrPubKey,
+        'refresh'
+      );
+
+      return tokenId;
+    } catch (error) {
+      throw new ServiceError('Error during refresh token invalidation', {
         cause: error as Error,
         details: {
           service: 'auth',
@@ -166,6 +214,37 @@ class AuthService {
       }
 
       throw new ServiceError('Could not verify jwt token', {
+        cause: error as Error,
+        details: {
+          service: 'auth',
+        },
+      });
+    }
+  }
+
+  private async invalidateJWTToken(
+    accessToken: string,
+    secretOrPubKey: string,
+    tokenType: TokenType
+  ): Promise<string> {
+    try {
+      const { exp, accountId } = verify(accessToken, secretOrPubKey) as {
+        exp: number;
+        accountId: string;
+      };
+
+      const expiresAt = new Date(exp * 1000);
+
+      const tokenId = await this.repository.create({
+        accountId,
+        expiresAt,
+        token: accessToken,
+        type: tokenType,
+      });
+
+      return tokenId;
+    } catch (error) {
+      throw new ServiceError('Error during jwt token invalidation', {
         cause: error as Error,
         details: {
           service: 'auth',

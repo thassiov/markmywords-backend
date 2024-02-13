@@ -34,20 +34,20 @@ const accountSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
   handle: z.string().min(4),
-  password: z.string().min(configs.appMinUserPasswordLength),
+  password: z.string().min(configs.appMinAccountPasswordLength),
 });
 
 const createAccountAndProfileDtoSchema = z.object({
   email: z.string().email(),
   name: z.string().min(1),
   handle: z.string().min(4),
-  password: z.string().min(configs.appMinUserPasswordLength),
+  password: z.string().min(configs.appMinAccountPasswordLength),
 });
 
 const createAccountDtoSchema = z.object({
   email: z.string().email(),
   handle: z.string().min(4),
-  password: z.string().min(configs.appMinUserPasswordLength),
+  password: z.string().min(configs.appMinAccountPasswordLength),
 });
 
 const retrieveAccountAndProfileDtoSchema = z.object({

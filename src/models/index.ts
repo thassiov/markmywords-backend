@@ -33,6 +33,7 @@ import {
   getSelectionDtoSchema,
   selectionSchema,
 } from './selection';
+import { IJWTToken, JWTTokenModel } from './token';
 
 AccountModel.hasOne(ProfileModel, {
   onDelete: 'CASCADE',
@@ -60,6 +61,14 @@ AccountModel.hasMany(CommentModel, {
   },
 });
 CommentModel.belongsTo(AccountModel);
+
+AccountModel.hasMany(JWTTokenModel, {
+  foreignKey: {
+    name: 'accountId',
+    allowNull: false,
+  },
+});
+JWTTokenModel.belongsTo(AccountModel);
 
 SelectionModel.hasMany(CommentModel, {
   onDelete: 'CASCADE',
@@ -105,4 +114,6 @@ export {
   ICreateCommentDto,
   commentSchema,
   createCommentDtoSchema,
+  JWTTokenModel,
+  IJWTToken,
 };

@@ -3,6 +3,7 @@ import { config } from 'dotenv';
 config();
 
 const jwtConfigs = {
+  // 1 day
   appJWTAccessTokenExpirationInSeconds:
     parseInt(
       process.env.APP_JWT_ACCESS_TOKEN_EXPIRATION_IN_SECONDS as string
@@ -34,6 +35,12 @@ const dbConfigs = {
 const restApiConfigs = {
   apiPort: parseInt(process.env.API_PORT as string) || 8080,
   appEnvironment: process.env.NODE_ENV || 'development',
+  appServerPublicKey: process.env.SERVER_PUBLIC_KEY || '',
+  appServerPrivateKey: process.env.SERVER_PRIVATE_KEY || '',
+  // 6 months
+  appServerCookieDurationInSeconds:
+    parseInt(process.env.SERVER_COOKIE_DURATION_IN_SECONDS as string) ||
+    15780000,
 };
 
 const userPasswordConfigs = {
