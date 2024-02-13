@@ -1,5 +1,3 @@
-import { faker } from '@faker-js/faker';
-
 import { SelectionService } from '.';
 import { ICreateSelectionDto } from '../../models/selection';
 import { SelectionRepository } from '../../repositories/selection';
@@ -29,7 +27,7 @@ describe('Selection Service', () => {
 
   describe('create', () => {
     it('should create a new selection', async () => {
-      const mockId = faker.string.uuid();
+      const mockId = 'somemockid';
       (mockSelectionRepository.create as jest.Mock).mockResolvedValueOnce(
         mockId
       );
@@ -46,7 +44,7 @@ describe('Selection Service', () => {
     });
 
     it('should create a selection and the text must be stripped of html tags', async () => {
-      const mockId = faker.string.uuid();
+      const mockId = 'somemockid';
       (mockSelectionRepository.create as jest.Mock).mockResolvedValueOnce(
         mockId
       );

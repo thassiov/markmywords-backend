@@ -1,4 +1,4 @@
-import { faker } from '@faker-js/faker';
+import { randomUUID } from 'crypto';
 
 import { ISelection } from '../../../models';
 
@@ -36,9 +36,9 @@ function getMockSelection(
   opts: MockSelectionOpts = { includeId: false, useCleanText: true }
 ) {
   const mockSelection = {
-    id: opts.includeId ? faker.string.uuid() : undefined,
+    id: opts.includeId ? randomUUID() : undefined,
     rawText: opts.useCleanText ? selections[0]!.text : selections[0]!.rawText,
-    url: faker.internet.url(),
+    url: `http://${randomUUID()}.com`,
   } as ISelection;
 
   return mockSelection;
