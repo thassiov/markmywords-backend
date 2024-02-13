@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import bcryptjs from 'bcryptjs';
 
 import { ICreateAccounAndProfileDto } from '../../models';
@@ -27,11 +26,11 @@ describe('account service', () => {
 
   describe('create', () => {
     it('create a new account with profile', async () => {
-      const mockAccountId = faker.string.uuid();
+      const mockAccountId = 'someaccountid';
       const mockAccountInfo = {
-        name: faker.person.fullName(),
-        email: faker.internet.email(),
-        handle: faker.internet.userName(),
+        name: 'somename',
+        email: 'someemail@email.com',
+        handle: 'somehandle',
         password: 'avalidpassword',
       };
 
@@ -63,12 +62,12 @@ describe('account service', () => {
     });
 
     it.each([
-      [{ email: faker.internet.email(), handle: faker.internet.userName() }],
-      [{ email: faker.internet.email(), name: faker.person.fullName() }],
-      [{ name: faker.person.fullName(), handle: faker.internet.userName() }],
-      [{ email: faker.internet.email() }],
-      [{ name: faker.person.fullName() }],
-      [{ handle: faker.internet.userName() }],
+      [{ email: 'someemail@email.com', handle: 'somehandle' }],
+      [{ email: 'someemail@email.com', name: 'somename' }],
+      [{ name: 'somename', handle: 'somehandle' }],
+      [{ email: 'someemail@email.com' }],
+      [{ name: 'somename' }],
+      [{ handle: 'somehandle' }],
       [{}],
     ] as unknown[])(
       'fails by not sending required information (%p)',
@@ -91,9 +90,9 @@ describe('account service', () => {
       'fails by trying to create an account with unique fields already in use (%p)',
       async (errorMessage) => {
         const mockAccountInfo = {
-          name: faker.person.fullName(),
-          email: faker.internet.email(),
-          handle: faker.internet.userName(),
+          name: 'somename',
+          email: 'someemail@email.com',
+          handle: 'somehandle',
           password: 'avalidpassword',
         };
 
@@ -115,7 +114,7 @@ describe('account service', () => {
 
   describe('remove', () => {
     it('remove an existing account', async () => {
-      const mockAccountId = faker.string.uuid();
+      const mockAccountId = 'someaccountid';
 
       (mockAccountRepository.remove as jest.Mock).mockResolvedValueOnce(true);
 
@@ -136,7 +135,7 @@ describe('account service', () => {
       const mockAccountInfo = {
         id: mockAccountId,
         handle: 'somehandle',
-        email: 'someemail',
+        email: 'someemail@email.com',
       };
 
       const mockProfileInfo = {
