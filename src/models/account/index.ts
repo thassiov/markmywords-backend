@@ -3,6 +3,7 @@ import {
   IAccount,
   ICreateAccounAndProfileDto,
   ICreateAccountDto,
+  IRetrieveAccountAndProfileDto,
   accountSchema,
   createAccountAndProfileDtoSchema,
   createAccountDtoSchema,
@@ -16,4 +17,5 @@ export {
   createAccountDtoSchema,
   createAccountAndProfileDtoSchema,
   ICreateAccounAndProfileDto,
+  IRetrieveAccountAndProfileDto,
 };

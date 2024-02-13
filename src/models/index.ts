@@ -5,6 +5,7 @@ import {
   IAccount,
   ICreateAccounAndProfileDto,
   ICreateAccountDto,
+  IRetrieveAccountAndProfileDto,
   accountSchema,
   createAccountAndProfileDtoSchema,
   createAccountDtoSchema,
@@ -81,6 +82,7 @@ async function syncDb(): Promise<void> {
 }
 
 export {
+  IRetrieveAccountAndProfileDto,
   SelectionModel,
   selectionSchema,
   getSelectionDtoSchema,
