@@ -77,6 +77,23 @@ describe('Auth Service', () => {
 
         expect(result).toEqual(true);
       });
+
+      it('catches an error when verifying a token with tampered payload', () => {
+        const mockTokenPayload = { userId: 'thisuserexists' };
+
+        const mockToken = 'token';
+        (jsonwebtoken.verify as jest.Mock).mockReturnValueOnce({
+          userId: 'thisuserdoesnotexist',
+        });
+
+        const authService = new AuthService();
+
+        expect(() =>
+          authService.verifyAccessToken(mockToken, mockTokenPayload)
+        ).toThrow(
+          'Could not verify jwt token: Expected values to be strictly deep-equal'
+        );
+      });
     });
 
     describe('refresh token', () => {
@@ -109,6 +126,23 @@ describe('Auth Service', () => {
         );
 
         expect(result).toEqual(true);
+      });
+
+      it('catches an error when verifying a token with tampered payload', () => {
+        const mockTokenPayload = { userId: 'thisuserexists' };
+
+        const mockToken = 'token';
+        (jsonwebtoken.verify as jest.Mock).mockReturnValueOnce({
+          userId: 'thisuserdoesnotexist',
+        });
+
+        const authService = new AuthService();
+
+        expect(() =>
+          authService.verifyRefreshToken(mockToken, mockTokenPayload)
+        ).toThrow(
+          'Could not verify jwt token: Expected values to be strictly deep-equal'
+        );
       });
     });
   });

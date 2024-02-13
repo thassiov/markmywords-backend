@@ -165,7 +165,7 @@ class AuthService {
         });
       }
 
-      throw new ServiceError('Could not verify access token', {
+      throw new ServiceError('Could not verify jwt token', {
         cause: error as Error,
         details: {
           service: 'auth',
