@@ -1,8 +1,10 @@
 import bcryptjs from 'bcryptjs';
+import jsonwebtoken from 'jsonwebtoken';
 
 import { AuthService } from './AuthService';
 
 jest.mock('bcryptjs');
+jest.mock('jsonwebtoken');
 
 describe('Auth Service', () => {
   describe('password operations', () => {
@@ -39,6 +41,74 @@ describe('Auth Service', () => {
 
         expect(result).toEqual(true);
         expect(bcryptjs.compare).toHaveBeenCalledWith(mockPassword, mockHash);
+      });
+    });
+  });
+
+  describe('jwt token', () => {
+    describe('access token', () => {
+      it('should issue a new access token', () => {
+        const mockTokenPayload = { userId: 'thisuserexists' };
+
+        const mockToken = 'token';
+        (jsonwebtoken.sign as jest.Mock).mockReturnValueOnce(mockToken);
+
+        const authService = new AuthService();
+
+        const result = authService.issueAccessToken(mockTokenPayload);
+
+        expect(result).toEqual(mockToken);
+      });
+
+      it('should verify a access token', () => {
+        const mockTokenPayload = { userId: 'thisuserexists' };
+
+        const mockToken = 'token';
+        (jsonwebtoken.verify as jest.Mock).mockReturnValueOnce(
+          mockTokenPayload
+        );
+
+        const authService = new AuthService();
+
+        const result = authService.verifyAccessToken(
+          mockToken,
+          mockTokenPayload
+        );
+
+        expect(result).toEqual(true);
+      });
+    });
+
+    describe('refresh token', () => {
+      it('should issue a new refresh token', () => {
+        const mockTokenPayload = { userId: 'thisuserexists' };
+
+        const mockToken = 'token';
+        (jsonwebtoken.sign as jest.Mock).mockReturnValueOnce(mockToken);
+
+        const authService = new AuthService();
+
+        const result = authService.issueRefreshToken(mockTokenPayload);
+
+        expect(result).toEqual(mockToken);
+      });
+
+      it('should verify a refresh token', () => {
+        const mockTokenPayload = { userId: 'thisuserexists' };
+
+        const mockToken = 'token';
+        (jsonwebtoken.verify as jest.Mock).mockReturnValueOnce(
+          mockTokenPayload
+        );
+
+        const authService = new AuthService();
+
+        const result = authService.verifyRefreshToken(
+          mockToken,
+          mockTokenPayload
+        );
+
+        expect(result).toEqual(true);
       });
     });
   });
