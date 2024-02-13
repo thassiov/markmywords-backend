@@ -54,6 +54,10 @@ export class ApplicationError extends CustomError {
   name = 'ApplicationError';
 }
 
+export class NotFoundError extends CustomError {
+  name = 'NotFoundError';
+}
+
 export enum ErrorMessages {
   CREATE_ACCOUNT_INVALID_ACCOUNT_INFO = 'Account information is invalid',
   CREATE_ACCOUNT_EMAIL_ALREADY_IN_USE = 'Email already in use',

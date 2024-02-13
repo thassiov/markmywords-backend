@@ -1,6 +1,7 @@
 import {
   AccountModel,
   IAccount,
+  IAccountSafeFields,
   ICreateAccounAndProfileDto,
   ICreateAccountDto,
   IRetrieveAccountAndProfileDto,
@@ -18,4 +19,5 @@ export {
   createAccountAndProfileDtoSchema,
   ICreateAccounAndProfileDto,
   IRetrieveAccountAndProfileDto,
+  IAccountSafeFields,
 };

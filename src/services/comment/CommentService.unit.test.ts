@@ -15,7 +15,7 @@ describe('Comment Service', () => {
     retrieve: jest.fn(),
   };
 
-  afterAll(() => {
+  afterEach(() => {
     jest.resetAllMocks();
     jest.clearAllMocks();
   });

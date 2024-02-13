@@ -1,12 +1,15 @@
 import { faker } from '@faker-js/faker';
+import bcryptjs from 'bcryptjs';
 
 import { ICreateAccounAndProfileDto } from '../../models';
 import { AccountRepository, ProfileRepository } from '../../repositories';
 import { ErrorMessages } from '../../utils/errors';
 import { AccountService } from './AccountService';
 
+jest.mock('bcryptjs');
+
 describe('account service', () => {
-  afterAll(() => {
+  afterEach(() => {
     jest.resetAllMocks();
     jest.clearAllMocks();
   });
@@ -14,10 +17,12 @@ describe('account service', () => {
   const mockAccountRepository = {
     create: jest.fn(),
     remove: jest.fn(),
+    retrieveSafeFields: jest.fn(),
   };
 
   const mockProfileRepository = {
     create: jest.fn(),
+    retrieveByAccountId: jest.fn(),
   };
 
   describe('create', () => {
@@ -27,8 +32,13 @@ describe('account service', () => {
         name: faker.person.fullName(),
         email: faker.internet.email(),
         handle: faker.internet.userName(),
+        password: 'avalidpassword',
       };
 
+      const mockSalt = 'salt';
+      const mockHash = 'hash';
+      (bcryptjs.genSalt as jest.Mock).mockResolvedValueOnce(mockSalt);
+      (bcryptjs.hash as jest.Mock).mockResolvedValueOnce(mockHash);
       (mockAccountRepository.create as jest.Mock).mockResolvedValueOnce(
         mockAccountId
       );
@@ -41,6 +51,15 @@ describe('account service', () => {
       const result = await accountService.create(mockAccountInfo);
 
       expect(result).toEqual(mockAccountId);
+      expect(mockAccountRepository.create).toHaveBeenCalledWith({
+        email: mockAccountInfo.email,
+        handle: mockAccountInfo.handle,
+        password: mockHash,
+      });
+      expect(mockProfileRepository.create).toHaveBeenCalledWith({
+        name: mockAccountInfo.name,
+        accountId: mockAccountId,
+      });
     });
 
     it.each([
@@ -75,6 +94,7 @@ describe('account service', () => {
           name: faker.person.fullName(),
           email: faker.internet.email(),
           handle: faker.internet.userName(),
+          password: 'avalidpassword',
         };
 
         (mockAccountRepository.create as jest.Mock).mockRejectedValueOnce(
@@ -107,6 +127,81 @@ describe('account service', () => {
       const result = await accountService.remove(mockAccountId);
 
       expect(result).toEqual(true);
+    });
+  });
+
+  describe('retrieve', () => {
+    it('retrieve an existing account', async () => {
+      const mockAccountId = 'someaccountid';
+      const mockAccountInfo = {
+        id: mockAccountId,
+        handle: 'somehandle',
+        email: 'someemail',
+      };
+
+      const mockProfileInfo = {
+        name: 'somename',
+      };
+
+      (
+        mockAccountRepository.retrieveSafeFields as jest.Mock
+      ).mockResolvedValueOnce(mockAccountInfo);
+      (
+        mockProfileRepository.retrieveByAccountId as jest.Mock
+      ).mockResolvedValueOnce(mockProfileInfo);
+
+      const accountService = new AccountService(
+        mockAccountRepository as any as AccountRepository,
+        mockProfileRepository as any as ProfileRepository
+      );
+
+      const result = await accountService.retrieve(mockAccountId);
+
+      expect(result).toEqual({ ...mockAccountInfo, ...mockProfileInfo });
+    });
+  });
+
+  describe('password operations', () => {
+    describe('hashing', () => {
+      it('should hash a given password', async () => {
+        const mockPassword = 'thispasswordissecure';
+        const mockSalt = 'salt';
+        const mockHash = 'hash';
+        (bcryptjs.genSalt as jest.Mock).mockResolvedValueOnce(mockSalt);
+        (bcryptjs.hash as jest.Mock).mockResolvedValueOnce(mockHash);
+
+        const accountService = new AccountService(
+          mockAccountRepository as any as AccountRepository,
+          mockProfileRepository as any as ProfileRepository
+        );
+
+        const result = await accountService.hashPassword(mockPassword);
+
+        expect(result).toEqual(mockHash);
+        expect(bcryptjs.genSalt).toHaveBeenCalledTimes(1);
+        expect(bcryptjs.hash).toHaveBeenCalledWith(mockPassword, mockSalt);
+      });
+    });
+
+    describe('verifying', () => {
+      it('should compare a plain text password with a hashed password', async () => {
+        const mockPassword = 'thispasswordissecure';
+        const mockHash = 'hash';
+        (bcryptjs.compare as jest.Mock).mockResolvedValueOnce(true);
+
+        const accountService = new AccountService(
+          mockAccountRepository as any as AccountRepository,
+          mockProfileRepository as any as ProfileRepository
+        );
+
+        const result = await accountService.verifyPasswordHash(
+          mockPassword,
+          mockHash
+        );
+
+        expect(result).toEqual(true);
+        expect(bcryptjs.compare).toHaveBeenCalledWith(mockPassword, mockHash);
+      });
     });
   });
 });

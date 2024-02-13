@@ -3,6 +3,7 @@ import { logger } from '../utils/logger';
 import {
   AccountModel,
   IAccount,
+  IAccountSafeFields,
   ICreateAccounAndProfileDto,
   ICreateAccountDto,
   IRetrieveAccountAndProfileDto,
@@ -116,4 +117,5 @@ export {
   createCommentDtoSchema,
   JWTTokenModel,
   IJWTToken,
+  IAccountSafeFields,
 };

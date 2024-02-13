@@ -22,7 +22,7 @@ describe('Selection Service', () => {
     remove: jest.fn(),
   };
 
-  afterAll(() => {
+  afterEach(() => {
     jest.resetAllMocks();
     jest.clearAllMocks();
   });

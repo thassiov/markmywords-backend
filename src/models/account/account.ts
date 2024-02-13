@@ -50,6 +50,12 @@ const createAccountDtoSchema = z.object({
   password: z.string().min(configs.appMinAccountPasswordLength),
 });
 
+const accountSafeFieldsSchema = z.object({
+  email: z.string().email(),
+  handle: z.string().min(4),
+  id: z.string().uuid(),
+});
+
 const retrieveAccountAndProfileDtoSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
@@ -65,6 +71,7 @@ type ICreateAccounAndProfileDto = z.infer<
 type IRetrieveAccountAndProfileDto = z.infer<
   typeof retrieveAccountAndProfileDtoSchema
 >;
+type IAccountSafeFields = z.infer<typeof accountSafeFieldsSchema>;
 
 export {
   AccountModel,
@@ -75,4 +82,5 @@ export {
   createAccountAndProfileDtoSchema,
   ICreateAccounAndProfileDto,
   IRetrieveAccountAndProfileDto,
+  IAccountSafeFields,
 };

@@ -1,8 +1,16 @@
 import { ModelStatic, Op, Sequelize, Transaction } from 'sequelize';
 
 import { ICreateAccountDto } from '../../models';
-import { AccountModel } from '../../models/account';
-import { RepositoryError } from '../../utils/errors';
+import {
+  AccountModel,
+  IAccount,
+  IAccountSafeFields,
+} from '../../models/account';
+import {
+  ErrorMessages,
+  NotFoundError,
+  RepositoryError,
+} from '../../utils/errors';
 
 class AccountRepository {
   private readonly db: ModelStatic<AccountModel>;
@@ -53,6 +61,59 @@ class AccountRepository {
     } catch (error) {
       await transaction.rollback();
       throw new RepositoryError('Could not create new account', {
+        cause: error as Error,
+        details: {
+          repository: 'account',
+          input: accountId,
+        },
+      });
+    }
+  }
+
+  async retrieveSafeFields(accountId: string): Promise<IAccountSafeFields> {
+    try {
+      const account = await this.db.findOne<AccountModel>({
+        attributes: ['id', 'email', 'handle'],
+        where: {
+          id: {
+            [Op.eq]: accountId,
+          },
+        },
+      });
+
+      if (!account) {
+        throw new NotFoundError(ErrorMessages.ACCOUNT_NOT_FOUND);
+      }
+
+      return account.toJSON();
+    } catch (error) {
+      throw new RepositoryError('Could not retrieve safe fields from account', {
+        cause: error as Error,
+        details: {
+          repository: 'account',
+          input: accountId,
+        },
+      });
+    }
+  }
+
+  async retrieve(accountId: string): Promise<IAccount> {
+    try {
+      const account = await this.db.findOne<AccountModel>({
+        where: {
+          id: {
+            [Op.eq]: accountId,
+          },
+        },
+      });
+
+      if (!account) {
+        throw new NotFoundError(ErrorMessages.ACCOUNT_NOT_FOUND);
+      }
+
+      return account.toJSON();
+    } catch (error) {
+      throw new RepositoryError('Could not retrieve account', {
         cause: error as Error,
         details: {
           repository: 'account',
