@@ -1,6 +1,7 @@
 import { compare, genSalt, hash } from 'bcryptjs';
 
 import {
+  IAccount,
   IAccountSafeFields,
   ICreateAccounAndProfileDto,
   IRetrieveAccountAndProfileDto,
@@ -69,13 +70,23 @@ class AccountService {
     }
   }
 
-  async retrieve(accountId: string): Promise<IRetrieveAccountAndProfileDto> {
+  async retrieve(
+    accountId: string
+  ): Promise<IRetrieveAccountAndProfileDto | null> {
     try {
       const accountInfo =
         await this.accRepository.retrieveSafeFieldsByAccountId(accountId);
 
+      if (!accountInfo) {
+        return null;
+      }
+
       const profileInfo =
         await this.profileRepository.retrieveByAccountId(accountId);
+
+      if (!profileInfo) {
+        return null;
+      }
 
       return {
         id: accountInfo.id,
@@ -94,9 +105,41 @@ class AccountService {
     }
   }
 
+  async retrieveByUserhandleOrEmailIfPasswordMatches(
+    accountIdentifier: string,
+    password: string
+  ): Promise<Omit<IAccount, 'password'> | null> {
+    try {
+      const account =
+        await this.accRepository.retrieveByUserhandleOrEmail(accountIdentifier);
+
+      if (!account) {
+        return null;
+      }
+
+      const { password: hashedPassword, ...rest } = account;
+
+      const isMatch = await this.verifyPasswordHash(password, hashedPassword);
+
+      if (!isMatch) {
+        return null;
+      }
+
+      return rest;
+    } catch (error) {
+      throw new ServiceError('Could not retrieve account', {
+        cause: error as Error,
+        details: {
+          service: 'account',
+          input: { accountIdentifier },
+        },
+      });
+    }
+  }
+
   async retrieveSafeFieldsByUserhandleOrEmail(
     accountIdentifier: string
-  ): Promise<IAccountSafeFields> {
+  ): Promise<IAccountSafeFields | null> {
     try {
       return this.accRepository.retrieveSafeFieldsByUserhandleOrEmail(
         accountIdentifier

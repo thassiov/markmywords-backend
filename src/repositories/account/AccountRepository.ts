@@ -1,4 +1,10 @@
-import { ModelStatic, Op, Sequelize, Transaction } from 'sequelize';
+import {
+  ModelStatic,
+  Op,
+  Sequelize,
+  Transaction,
+  WhereOptions,
+} from 'sequelize';
 
 import { ICreateAccountDto } from '../../models';
 import {
@@ -6,11 +12,7 @@ import {
   IAccount,
   IAccountSafeFields,
 } from '../../models/account';
-import {
-  ErrorMessages,
-  NotFoundError,
-  RepositoryError,
-} from '../../utils/errors';
+import { RepositoryError } from '../../utils/errors';
 
 type QueryForKeysOptions = {
   fields: string[];
@@ -77,35 +79,41 @@ class AccountRepository {
 
   async retrieveSafeFieldsByAccountId(
     accountId: string
-  ): Promise<IAccountSafeFields> {
+  ): Promise<IAccountSafeFields | null> {
     const options = { fields: ['id'], value: accountId };
     return this.retrieveSafeFields(options);
   }
 
   async retrieveSafeFieldsByUserhandleOrEmail(
     accountIdentifier: string
-  ): Promise<IAccountSafeFields> {
+  ): Promise<IAccountSafeFields | null> {
     const options = { fields: ['email', 'handle'], value: accountIdentifier };
     return this.retrieveSafeFields(options);
   }
 
+  async retrieveByAccountId(accountId: string): Promise<IAccount | null> {
+    const options = { fields: ['id'], value: accountId };
+    return this.retrieve(options);
+  }
+
+  async retrieveByUserhandleOrEmail(
+    accountIdentifier: string
+  ): Promise<IAccount | null> {
+    const options = { fields: ['email', 'handle'], value: accountIdentifier };
+    return this.retrieve(options);
+  }
+
   private async retrieveSafeFields(
     queryOptions: QueryForKeysOptions
-  ): Promise<IAccountSafeFields> {
+  ): Promise<IAccountSafeFields | null> {
     try {
-      const where = queryOptions.fields
-        .map((field) => ({
-          [field]: { [Op.eq]: queryOptions.value },
-        }))
-        .reduce((acc, curr) => ({ ...acc, ...curr }), {});
-
       const account = await this.db.findOne<AccountModel>({
-        where,
+        where: this.setQueryOptions(queryOptions),
         attributes: ['id', 'email', 'handle'],
       });
 
       if (!account) {
-        throw new NotFoundError(ErrorMessages.ACCOUNT_NOT_FOUND);
+        return null;
       }
 
       return account.toJSON();
@@ -120,18 +128,16 @@ class AccountRepository {
     }
   }
 
-  async retrieve(accountId: string): Promise<IAccount> {
+  private async retrieve(
+    queryOptions: QueryForKeysOptions
+  ): Promise<IAccount | null> {
     try {
       const account = await this.db.findOne<AccountModel>({
-        where: {
-          id: {
-            [Op.eq]: accountId,
-          },
-        },
+        where: this.setQueryOptions(queryOptions),
       });
 
       if (!account) {
-        throw new NotFoundError(ErrorMessages.ACCOUNT_NOT_FOUND);
+        return null;
       }
 
       return account.toJSON();
@@ -140,7 +146,6 @@ class AccountRepository {
         cause: error as Error,
         details: {
           repository: 'account',
-          input: accountId,
         },
       });
     }
@@ -149,6 +154,14 @@ class AccountRepository {
   private async getTransaction(): Promise<Transaction> {
     const t = await this.sequelize.transaction();
     return t;
+  }
+
+  private setQueryOptions(queryOptions: QueryForKeysOptions): WhereOptions {
+    return queryOptions.fields
+      .map((field) => ({
+        [field]: { [Op.eq]: queryOptions.value },
+      }))
+      .reduce((acc, curr) => ({ ...acc, ...curr }), {});
   }
 }
 
