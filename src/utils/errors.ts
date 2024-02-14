@@ -58,13 +58,39 @@ export class NotFoundError extends CustomError {
   name = 'NotFoundError';
 }
 
-export enum ErrorMessages {
-  CREATE_ACCOUNT_INVALID_ACCOUNT_INFO = 'Account information is invalid',
-  CREATE_ACCOUNT_EMAIL_ALREADY_IN_USE = 'Email already in use',
-  CREATE_ACCOUNT_USERHANDLE_ALREADY_IN_USE = 'User handle already in use',
-  SELECTION_NOT_FOUND = 'Selection not found',
-  ACCOUNT_NOT_FOUND = 'Account not found',
-  PROFILE_NOT_FOUND = 'Profile not found',
-  COMMENT_NOT_FOUND = 'Comment not found',
-  CREATE_COMMENT_BODY_NOT_DEFINED = "The comment's body is not defined",
-}
+const ErrorMessagesAccount = {
+  CREATE_ACCOUNT_INVALID_ACCOUNT_INFO: 'Account information is invalid',
+  CREATE_ACCOUNT_EMAIL_ALREADY_IN_USE: 'Email already in use',
+  CREATE_ACCOUNT_USERHANDLE_ALREADY_IN_USE: 'User handle already in use',
+  ACCOUNT_NOT_FOUND: 'Account not found',
+  COULD_NOT_DELETE_ACCOUNT: 'The account could not be deleted',
+};
+
+const ErrorMessagesSelection = {
+  CREATE_SELECTION_INVALID_DATA_FORMAT:
+    "The selection's data format is invalid",
+  SELECTION_NOT_FOUND: 'Selection not found',
+  COULD_NOT_DELETE_SELECTION: 'The selection could not be deleted',
+};
+
+const ErrorMessagesProfile = {
+  PROFILE_NOT_FOUND: 'Profile not found',
+};
+
+const ErrorMessagesComment = {
+  CREATE_COMMENT_BODY_NOT_DEFINED: "The comment's body is not defined",
+  COULD_NOT_DELETE_COMMENT: 'The comment could not be deleted',
+  COMMENT_NOT_FOUND: 'Comment not found',
+};
+
+const ErrorMessagesShared = {
+  INVALID_ID: 'The provided id is invalid',
+};
+
+export const ErrorMessages = {
+  ...ErrorMessagesAccount,
+  ...ErrorMessagesSelection,
+  ...ErrorMessagesProfile,
+  ...ErrorMessagesComment,
+  ...ErrorMessagesShared,
+};

@@ -6,7 +6,7 @@ import {
   createSelectionDtoSchema,
 } from '../../../models/selection';
 import { SelectionService } from '../../../services';
-import { EndpointHandlerError } from '../../../utils/errors';
+import { EndpointHandlerError, ErrorMessages } from '../../../utils/errors';
 import { EndpointHandler } from '../../../utils/types';
 
 function createSelectionHandlerFactory(
@@ -19,8 +19,7 @@ function createSelectionHandlerFactory(
     try {
       if (!createSelectionDtoSchema.safeParse(req.body).success) {
         res.status(StatusCodes.BAD_REQUEST).json({
-          message:
-            'Invalid request body format. Please ensure the request body follows the expected format.',
+          message: ErrorMessages.CREATE_SELECTION_INVALID_DATA_FORMAT,
         });
         return;
       }

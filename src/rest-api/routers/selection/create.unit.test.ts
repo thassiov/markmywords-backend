@@ -2,6 +2,7 @@ import { getMockReq, getMockRes } from '@jest-mock/express';
 import { StatusCodes } from 'http-status-codes';
 
 import { SelectionService } from '../../../services';
+import { ErrorMessages } from '../../../utils/errors';
 import { getMockSelection } from '../../../utils/tests/mocks/selection';
 import { createSelectionHandlerFactory } from './create';
 
@@ -29,7 +30,7 @@ describe('REST: selection createNewHandler', () => {
     });
   });
 
-  it('should fail by sending the wrong data formst', async () => {
+  it('should fail by sending the wrong data format', async () => {
     const createSelectionHandler = createSelectionHandlerFactory(
       mockSelectionService as any as SelectionService
     );
@@ -42,8 +43,7 @@ describe('REST: selection createNewHandler', () => {
 
     expect(mockRes.status).toHaveBeenCalledWith(StatusCodes.BAD_REQUEST);
     expect(mockRes.json).toHaveBeenCalledWith({
-      message:
-        'Invalid request body format. Please ensure the request body follows the expected format.',
+      message: ErrorMessages.CREATE_SELECTION_INVALID_DATA_FORMAT,
     });
   });
 });

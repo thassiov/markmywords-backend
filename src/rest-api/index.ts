@@ -20,7 +20,7 @@ function startApi(services: Services, listen = true): Express | void {
 
   const router = setupRouter(services);
 
-  api.use('/v1', router);
+  api.use('/api/v1', router);
 
   if (!listen) {
     return api;

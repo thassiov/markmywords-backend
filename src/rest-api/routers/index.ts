@@ -1,27 +1,16 @@
-import express, { Router } from 'express';
+import { Router } from 'express';
 
 import { Services } from '../../utils/types';
-import {
-  createSelectionHandlerFactory,
-  deleteSelectionHandlerFactory,
-  retrieveSelectionHandlerFactory,
-} from './selection';
-
-const router = express.Router();
+import { setupAccountRouter } from './account';
+import { setupSelectionRouter } from './selection';
 
 function setupRouter(services: Services): Router {
-  router.use('/v1');
+  const router = Router();
 
-  // @TODO will require 'is authenticated' middleware
-  router.post('/selections', createSelectionHandlerFactory(services.selection));
-  router.get(
-    '/selections/:id',
-    retrieveSelectionHandlerFactory(services.selection)
-  );
-  router.delete(
-    '/selections/:id',
-    deleteSelectionHandlerFactory(services.selection)
-  );
+  // @TODO will need to create a 'is-authenticated' middleware
+
+  router.use('/', setupAccountRouter(services.account));
+  router.use('/selections', setupSelectionRouter(services.selection));
 
   return router;
 }

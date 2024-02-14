@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 
 import { SelectionService } from '../../../services';
-import { EndpointHandlerError } from '../../../utils/errors';
+import { EndpointHandlerError, ErrorMessages } from '../../../utils/errors';
 import { EndpointHandler } from '../../../utils/types';
 
 const selectionIdSchema = z.string().uuid();
@@ -18,8 +18,7 @@ function deleteSelectionHandlerFactory(
     try {
       if (!selectionIdSchema.safeParse(req.params.id).success) {
         res.status(StatusCodes.BAD_REQUEST).json({
-          message:
-            'Invalid request param format. Please ensure the request param follows the expected format.',
+          message: ErrorMessages.INVALID_ID,
         });
         return;
       }
@@ -28,8 +27,7 @@ function deleteSelectionHandlerFactory(
 
       if (!result) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-          message: 'Selection was not deleted',
-          selectionId: req.params.id,
+          message: ErrorMessages.COULD_NOT_DELETE_SELECTION,
         });
         return;
       }

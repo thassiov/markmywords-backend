@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import { StatusCodes } from 'http-status-codes';
 
 import { SelectionService } from '../../../services';
+import { ErrorMessages } from '../../../utils/errors';
 import { deleteSelectionHandlerFactory } from './delete';
 
 describe('REST: selection deleteSelectionHandler', () => {
@@ -46,8 +47,7 @@ describe('REST: selection deleteSelectionHandler', () => {
       StatusCodes.INTERNAL_SERVER_ERROR
     );
     expect(mockRes.json).toHaveBeenCalledWith({
-      message: 'Selection was not deleted',
-      selectionId: mockId,
+      message: ErrorMessages.COULD_NOT_DELETE_SELECTION,
     });
   });
 
@@ -69,8 +69,7 @@ describe('REST: selection deleteSelectionHandler', () => {
 
     expect(mockRes.status).toHaveBeenCalledWith(StatusCodes.BAD_REQUEST);
     expect(mockRes.json).toHaveBeenCalledWith({
-      message:
-        'Invalid request param format. Please ensure the request param follows the expected format.',
+      message: ErrorMessages.INVALID_ID,
     });
   });
 });
