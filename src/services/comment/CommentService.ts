@@ -36,6 +36,20 @@ class CommentService {
       });
     }
   }
+
+  async remove(commentId: string): Promise<boolean> {
+    try {
+      return this.repository.remove(commentId);
+    } catch (error) {
+      throw new ServiceError('Could not remove comment', {
+        cause: error as Error,
+        details: {
+          service: 'comment',
+          input: { commentId },
+        },
+      });
+    }
+  }
 }
 
 export { CommentService };

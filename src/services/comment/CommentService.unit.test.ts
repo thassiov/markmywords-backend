@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto';
+
 import { ICreateCommentDto } from '../../models/comment';
 import { CommentRepository } from '../../repositories/comment';
 import { ErrorMessages } from '../../utils/errors';
@@ -61,6 +63,19 @@ describe('Comment Service', () => {
       expect(() =>
         commentService.create(mockComment as ICreateCommentDto)
       ).rejects.toThrow(ErrorMessages.SELECTION_NOT_FOUND);
+    });
+  });
+
+  describe('remove', () => {
+    it('should remove an existing comment', async () => {
+      const commentId = randomUUID();
+      (mockCommentRepository.remove as jest.Mock).mockResolvedValueOnce(true);
+
+      const commentService = new CommentService(
+        mockCommentRepository as any as CommentRepository,
+        mockSelectionService as any as SelectionService
+      );
+      expect(commentService.remove(commentId)).resolves.toBe(true);
     });
   });
 });
