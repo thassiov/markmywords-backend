@@ -15,6 +15,7 @@ describe('REST: account create', () => {
       handle: 'somehandler',
       name: 'some name',
       email: 'thisemail@is.fake',
+      password: 'somepassword',
     };
 
     const createAccountHandler = createAccountHandlerFactory(
@@ -40,6 +41,7 @@ describe('REST: account create', () => {
       handle1: 'somehandler',
       name1: 'some name',
       email1: 'thisemail@is.fake',
+      password1: 'somepassword',
     };
 
     const createAccountHandler = createAccountHandlerFactory(
@@ -69,6 +71,7 @@ describe('REST: account create', () => {
         handle: 'somehandler',
         name: 'some name',
         email: 'thisemail@is.fake',
+        password: 'somepassword',
       };
 
       (mockAccountService.create as jest.Mock).mockRejectedValueOnce(
