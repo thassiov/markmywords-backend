@@ -2,6 +2,33 @@ import { config } from 'dotenv';
 
 config();
 
+// @TODO I know these configs are a mess but I don't want to deal with it right now
+
+const corsConfigs = {
+  appCorsDomain: process.env.SERVER_DOMAIN || 'localhost',
+  appCorsCredentials: true,
+};
+
+const requestCookiesConfigs = {
+  // 1 day, same as appJWTAccessTokenExpirationInSeconds or a custom config
+  appCookiesAccessTokenMaxAge:
+    parseInt(
+      (process.env.APP_JWT_ACCESS_TOKEN_EXPIRATION_IN_SECONDS as string) ||
+        (process.env.APP_ACCESS_TOKEN_COOKIE_MAX_AGE_IN_SECONDS as string)
+    ) || 86400,
+  // 6 months
+  appCookiesRefreshTokenMaxAge:
+    parseInt(
+      process.env.APP_REFRESH_TOKEN_COOKIE_MAX_AGE_IN_SECONDS as string
+    ) || 15780000,
+  appCookiesSecure:
+    process.env.SERVER_CERTIFICATE && process.env.SERVER_PRIVATE_KEY
+      ? true
+      : false,
+  appCookiesDomain: process.env.SERVER_DOMAIN || 'localhost',
+  appCookiesHttpOnly: true,
+};
+
 const jwtConfigs = {
   // 1 day
   appJWTAccessTokenExpirationInSeconds:
@@ -35,12 +62,8 @@ const dbConfigs = {
 const restApiConfigs = {
   apiPort: parseInt(process.env.API_PORT as string) || 8080,
   appEnvironment: process.env.NODE_ENV || 'development',
-  appServerPublicKey: process.env.SERVER_PUBLIC_KEY || '',
+  appServerCertificate: process.env.SERVER_CERTIFICATE || '',
   appServerPrivateKey: process.env.SERVER_PRIVATE_KEY || '',
-  // 6 months
-  appServerCookieDurationInSeconds:
-    parseInt(process.env.SERVER_COOKIE_DURATION_IN_SECONDS as string) ||
-    15780000,
 };
 
 const userPasswordConfigs = {
@@ -55,6 +78,8 @@ const configs = {
   ...restApiConfigs,
   ...userPasswordConfigs,
   ...jwtConfigs,
+  ...requestCookiesConfigs,
+  ...corsConfigs,
 };
 
 export { configs };

@@ -66,6 +66,11 @@ const ErrorMessagesAccount = {
   COULD_NOT_DELETE_ACCOUNT: 'The account could not be deleted',
 };
 
+const ErrorMessagesLogin = {
+  LOGIN_INVALID_DATA_INFO: 'Login information is invalid',
+  LOGIN_WRONG_USERNAME_OR_PASSWORD: 'Wrong username or password',
+};
+
 const ErrorMessagesSelection = {
   CREATE_SELECTION_INVALID_DATA_FORMAT:
     "The selection's data format is invalid",
@@ -90,6 +95,7 @@ const ErrorMessagesShared = {
 
 export const ErrorMessages = {
   ...ErrorMessagesAccount,
+  ...ErrorMessagesLogin,
   ...ErrorMessagesSelection,
   ...ErrorMessagesProfile,
   ...ErrorMessagesComment,
