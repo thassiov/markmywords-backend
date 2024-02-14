@@ -118,4 +118,5 @@ export {
   JWTTokenModel,
   IJWTToken,
   IAccountSafeFields,
+  AccountModel,
 };
