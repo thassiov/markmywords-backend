@@ -1,6 +1,7 @@
 import { compare, genSalt, hash } from 'bcryptjs';
 
 import {
+  IAccountSafeFields,
   ICreateAccounAndProfileDto,
   IRetrieveAccountAndProfileDto,
   createAccountAndProfileDtoSchema,
@@ -71,7 +72,7 @@ class AccountService {
   async retrieve(accountId: string): Promise<IRetrieveAccountAndProfileDto> {
     try {
       const accountInfo =
-        await this.accRepository.retrieveSafeFields(accountId);
+        await this.accRepository.retrieveSafeFieldsByAccountId(accountId);
 
       const profileInfo =
         await this.profileRepository.retrieveByAccountId(accountId);
@@ -88,6 +89,24 @@ class AccountService {
         details: {
           service: 'account',
           input: accountId,
+        },
+      });
+    }
+  }
+
+  async retrieveSafeFieldsByUserhandleOrEmail(
+    accountIdentifier: string
+  ): Promise<IAccountSafeFields> {
+    try {
+      return this.accRepository.retrieveSafeFieldsByUserhandleOrEmail(
+        accountIdentifier
+      );
+    } catch (error) {
+      throw new ServiceError('Could not retrieve account', {
+        cause: error as Error,
+        details: {
+          service: 'account',
+          input: { accountIdentifier },
         },
       });
     }

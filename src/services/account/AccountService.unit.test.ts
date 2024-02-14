@@ -16,7 +16,8 @@ describe('account service', () => {
   const mockAccountRepository = {
     create: jest.fn(),
     remove: jest.fn(),
-    retrieveSafeFields: jest.fn(),
+    retrieveSafeFieldsByAccountId: jest.fn(),
+    retrieveSafeFieldsByUserhandleOrEmail: jest.fn(),
   };
 
   const mockProfileRepository = {
@@ -130,7 +131,7 @@ describe('account service', () => {
   });
 
   describe('retrieve', () => {
-    it('retrieve an existing account', async () => {
+    it('retrieve an existing account by accountId', async () => {
       const mockAccountId = 'someaccountid';
       const mockAccountInfo = {
         id: mockAccountId,
@@ -143,7 +144,7 @@ describe('account service', () => {
       };
 
       (
-        mockAccountRepository.retrieveSafeFields as jest.Mock
+        mockAccountRepository.retrieveSafeFieldsByAccountId as jest.Mock
       ).mockResolvedValueOnce(mockAccountInfo);
       (
         mockProfileRepository.retrieveByAccountId as jest.Mock
@@ -157,6 +158,56 @@ describe('account service', () => {
       const result = await accountService.retrieve(mockAccountId);
 
       expect(result).toEqual({ ...mockAccountInfo, ...mockProfileInfo });
+    });
+
+    it('retrieve an existing account by user handle', async () => {
+      const mockUserHandle = 'somehandle';
+      const mockAccountInfo = {
+        id: 'someaccountid',
+        handle: mockUserHandle,
+        email: 'someemail@email.com',
+      };
+
+      (
+        mockAccountRepository.retrieveSafeFieldsByUserhandleOrEmail as jest.Mock
+      ).mockResolvedValueOnce(mockAccountInfo);
+
+      const accountService = new AccountService(
+        mockAccountRepository as any as AccountRepository,
+        mockProfileRepository as any as ProfileRepository
+      );
+
+      const result =
+        await accountService.retrieveSafeFieldsByUserhandleOrEmail(
+          mockUserHandle
+        );
+
+      expect(result).toEqual(mockAccountInfo);
+    });
+
+    it('retrieve an existing account by user email', async () => {
+      const mockUserEmail = 'someemail@email.com';
+      const mockAccountInfo = {
+        id: 'someaccountid',
+        handle: 'somehandle',
+        email: mockUserEmail,
+      };
+
+      (
+        mockAccountRepository.retrieveSafeFieldsByUserhandleOrEmail as jest.Mock
+      ).mockResolvedValueOnce(mockAccountInfo);
+
+      const accountService = new AccountService(
+        mockAccountRepository as any as AccountRepository,
+        mockProfileRepository as any as ProfileRepository
+      );
+
+      const result =
+        await accountService.retrieveSafeFieldsByUserhandleOrEmail(
+          mockUserEmail
+        );
+
+      expect(result).toEqual(mockAccountInfo);
     });
   });
 
