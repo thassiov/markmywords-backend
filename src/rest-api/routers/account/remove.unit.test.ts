@@ -7,6 +7,11 @@ import { ErrorMessages } from '../../../utils/errors';
 import { removeAccountHandlerFactory } from './remove';
 
 describe('REST: account removeAccountHandler', () => {
+  afterEach(() => {
+    jest.resetAllMocks();
+    jest.clearAllMocks();
+  });
+
   const mockAccountService = {
     remove: jest.fn(),
   };
