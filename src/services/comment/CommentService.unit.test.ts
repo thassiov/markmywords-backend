@@ -36,9 +36,7 @@ describe('Comment Service', () => {
 
       const commentService = new CommentService(
         mockCommentRepository as any as CommentRepository,
-        {
-          selection: mockSelectionService as any as SelectionService,
-        }
+        mockSelectionService as any as SelectionService
       );
 
       const id = await commentService.create(mockComment as ICreateCommentDto);
@@ -57,9 +55,7 @@ describe('Comment Service', () => {
 
       const commentService = new CommentService(
         mockCommentRepository as any as CommentRepository,
-        {
-          selection: mockSelectionService as any as SelectionService,
-        }
+        mockSelectionService as any as SelectionService
       );
 
       expect(() =>
