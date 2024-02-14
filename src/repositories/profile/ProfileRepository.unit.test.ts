@@ -128,6 +128,5 @@ describe('Profile Repository', () => {
         profileRepository.retrieveByAccountId(mockProfileId)
       ).rejects.toThrow(ErrorMessages.PROFILE_NOT_FOUND);
     });
-
   });
 });
