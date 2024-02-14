@@ -1,4 +1,4 @@
-import { ModelStatic, Sequelize, Transaction } from 'sequelize';
+import { ModelStatic, Op, Sequelize, Transaction } from 'sequelize';
 
 import { CommentModel, ICreateCommentDto } from '../../models';
 import { RepositoryError } from '../../utils/errors';
@@ -25,6 +25,69 @@ class CommentRepository {
         details: {
           repository: 'comment',
           input: commmentDto,
+        },
+      });
+    }
+  }
+
+  async edit(commentId: string, commentBody: string): Promise<boolean> {
+    const transaction = await this.getTransaction();
+    try {
+      const [result] = await this.db.update<CommentModel>(
+        { body: commentBody },
+        {
+          transaction,
+          where: {
+            id: {
+              [Op.eq]: commentId,
+            },
+          },
+        }
+      );
+
+      await transaction.commit();
+
+      if (!result) {
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      await transaction.rollback();
+      throw new RepositoryError("Could not update comment's content", {
+        cause: error as Error,
+        details: {
+          repository: 'comment',
+          input: { commentId, commentBody },
+        },
+      });
+    }
+  }
+
+  async remove(commentId: string): Promise<boolean> {
+    const transaction = await this.getTransaction();
+    try {
+      const result = await this.db.destroy({
+        transaction,
+        where: {
+          id: {
+            [Op.eq]: commentId,
+          },
+        },
+      });
+
+      if (!result) {
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      await transaction.rollback();
+      throw new RepositoryError('Could not delete comment', {
+        cause: error as Error,
+        details: {
+          repository: 'comment',
+          input: { commentId },
         },
       });
     }
