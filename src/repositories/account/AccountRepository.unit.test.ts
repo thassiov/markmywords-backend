@@ -1,4 +1,4 @@
-import { Sequelize, Transaction } from 'sequelize';
+import { Op, Sequelize, Transaction } from 'sequelize';
 
 import { AccountModel } from '../../models';
 import { ErrorMessages } from '../../utils/errors';
@@ -90,91 +90,231 @@ describe('Account Repository', () => {
   });
 
   describe('retrieve', () => {
-    it('should retrieve safe fields (no password) from the account', async () => {
-      const mockAccountId = 'someaccountid';
-      const mockAccountInfo = {
-        id: 'someid',
-        email: 'someemail@email.com',
-        handle: 'somehandle',
-      };
+    describe('all record data', () => {
+      it('should retrieve all record data from the account', async () => {
+        const mockAccountId = 'someaccountid';
+        const mockAccountInfo = {
+          id: 'someid',
+          email: 'someemail@email.com',
+          handle: 'somehandle',
+          password: 'somehashedpassword',
+        };
 
-      const mockAccountSafeFields = {
-        toJSON: () => mockAccountInfo,
-      };
+        const mockAccountSafeFields = {
+          toJSON: () => mockAccountInfo,
+        };
 
-      const sequelize = new Sequelize();
+        const sequelize = new Sequelize();
 
-      jest
-        .spyOn(AccountModel, 'findOne')
-        .mockResolvedValueOnce(mockAccountSafeFields as any);
+        jest
+          .spyOn(AccountModel, 'findOne')
+          .mockResolvedValueOnce(mockAccountSafeFields as any);
 
-      jest.spyOn(sequelize, 'model').mockReturnValueOnce(AccountModel);
+        jest.spyOn(sequelize, 'model').mockReturnValueOnce(AccountModel);
 
-      const accountRepository = new AccountRepository(sequelize);
+        const accountRepository = new AccountRepository(sequelize);
 
-      const result = await accountRepository.retrieveSafeFields(mockAccountId);
+        const result = await accountRepository.retrieve(mockAccountId);
 
-      expect(result).toEqual(mockAccountInfo);
+        expect(result).toEqual(mockAccountInfo);
+      });
+
+      it('should fail by trying to retrieve all record data from an account that does not exist', async () => {
+        const mockAccountId = 'doesnoexist';
+
+        const sequelize = new Sequelize();
+
+        jest.spyOn(AccountModel, 'findOne').mockResolvedValueOnce(null);
+
+        jest.spyOn(sequelize, 'model').mockReturnValueOnce(AccountModel);
+
+        const accountRepository = new AccountRepository(sequelize);
+
+        expect(() => accountRepository.retrieve(mockAccountId)).rejects.toThrow(
+          ErrorMessages.ACCOUNT_NOT_FOUND
+        );
+      });
+    });
+    describe('by account Id', () => {
+      it('should retrieve safe fields (no password) from the account', async () => {
+        const mockAccountId = 'someaccountid';
+        const mockAccountInfo = {
+          id: 'someid',
+          email: 'someemail@email.com',
+          handle: 'somehandle',
+        };
+
+        const mockAccountSafeFields = {
+          toJSON: () => mockAccountInfo,
+        };
+
+        const sequelize = new Sequelize();
+
+        jest
+          .spyOn(AccountModel, 'findOne')
+          .mockResolvedValueOnce(mockAccountSafeFields as any);
+
+        jest.spyOn(sequelize, 'model').mockReturnValueOnce(AccountModel);
+
+        const accountRepository = new AccountRepository(sequelize);
+
+        const result =
+          await accountRepository.retrieveSafeFieldsByAccountId(mockAccountId);
+
+        expect(result).toEqual(mockAccountInfo);
+        expect(AccountModel.findOne).toHaveBeenCalledWith({
+          where: {
+            id: { [Op.eq]: mockAccountId },
+          },
+          attributes: ['id', 'email', 'handle'],
+        });
+      });
+
+      it('should fail by trying to retrieve safe fields from an account that does not exist', async () => {
+        const mockAccountId = 'doesnoexist';
+
+        const sequelize = new Sequelize();
+
+        jest.spyOn(AccountModel, 'findOne').mockResolvedValueOnce(null);
+
+        jest.spyOn(sequelize, 'model').mockReturnValueOnce(AccountModel);
+
+        const accountRepository = new AccountRepository(sequelize);
+
+        expect(() =>
+          accountRepository.retrieveSafeFieldsByAccountId(mockAccountId)
+        ).rejects.toThrow(ErrorMessages.ACCOUNT_NOT_FOUND);
+        expect(AccountModel.findOne).toHaveBeenCalledWith({
+          where: {
+            id: { [Op.eq]: mockAccountId },
+          },
+          attributes: ['id', 'email', 'handle'],
+        });
+      });
     });
 
-    it('should fail by trying to retrieve safe fields from an account that does not exist', async () => {
-      const mockAccountId = 'doesnoexist';
+    describe('by account userhandle and email', () => {
+      it('by user handle: should retrieve safe fields (no password) from the account', async () => {
+        const mockUserHandle = 'someuserhandle';
+        const mockAccountInfo = {
+          id: 'someid',
+          email: 'someemail@email.com',
+          handle: mockUserHandle,
+        };
 
-      const sequelize = new Sequelize();
+        const mockAccountSafeFields = {
+          toJSON: () => mockAccountInfo,
+        };
 
-      jest.spyOn(AccountModel, 'findOne').mockResolvedValueOnce(null);
+        const sequelize = new Sequelize();
 
-      jest.spyOn(sequelize, 'model').mockReturnValueOnce(AccountModel);
+        jest
+          .spyOn(AccountModel, 'findOne')
+          .mockResolvedValueOnce(mockAccountSafeFields as any);
 
-      const accountRepository = new AccountRepository(sequelize);
+        jest.spyOn(sequelize, 'model').mockReturnValueOnce(AccountModel);
 
-      expect(() =>
-        accountRepository.retrieveSafeFields(mockAccountId)
-      ).rejects.toThrow(ErrorMessages.ACCOUNT_NOT_FOUND);
-    });
+        const accountRepository = new AccountRepository(sequelize);
 
-    it('should retrieve all record data from the account', async () => {
-      const mockAccountId = 'someaccountid';
-      const mockAccountInfo = {
-        id: 'someid',
-        email: 'someemail@email.com',
-        handle: 'somehandle',
-        password: 'somehashedpassword',
-      };
+        const result =
+          await accountRepository.retrieveSafeFieldsByUserhandleOrEmail(
+            mockUserHandle
+          );
 
-      const mockAccountSafeFields = {
-        toJSON: () => mockAccountInfo,
-      };
+        expect(result).toEqual(mockAccountInfo);
+        expect(AccountModel.findOne).toHaveBeenCalledWith({
+          where: {
+            email: { [Op.eq]: mockUserHandle },
+            handle: { [Op.eq]: mockUserHandle },
+          },
+          attributes: ['id', 'email', 'handle'],
+        });
+      });
 
-      const sequelize = new Sequelize();
+      it('by user handle: should fail by trying to retrieve safe fields from an account that does not exist', async () => {
+        const mockUserHandle = 'doesnoexist';
 
-      jest
-        .spyOn(AccountModel, 'findOne')
-        .mockResolvedValueOnce(mockAccountSafeFields as any);
+        const sequelize = new Sequelize();
 
-      jest.spyOn(sequelize, 'model').mockReturnValueOnce(AccountModel);
+        jest.spyOn(AccountModel, 'findOne').mockResolvedValueOnce(null);
 
-      const accountRepository = new AccountRepository(sequelize);
+        jest.spyOn(sequelize, 'model').mockReturnValueOnce(AccountModel);
 
-      const result = await accountRepository.retrieve(mockAccountId);
+        const accountRepository = new AccountRepository(sequelize);
 
-      expect(result).toEqual(mockAccountInfo);
-    });
+        expect(() =>
+          accountRepository.retrieveSafeFieldsByUserhandleOrEmail(
+            mockUserHandle
+          )
+        ).rejects.toThrow(ErrorMessages.ACCOUNT_NOT_FOUND);
+        expect(AccountModel.findOne).toHaveBeenCalledWith({
+          where: {
+            email: { [Op.eq]: mockUserHandle },
+            handle: { [Op.eq]: mockUserHandle },
+          },
+          attributes: ['id', 'email', 'handle'],
+        });
+      });
 
-    it('should fail by trying to retrieve all record data from an account that does not exist', async () => {
-      const mockAccountId = 'doesnoexist';
+      it('by user email: should retrieve safe fields (no password) from the account', async () => {
+        const mockUserEmail = 'someemail@email.com';
+        const mockAccountInfo = {
+          id: 'someid',
+          email: mockUserEmail,
+          handle: 'someuserhandle',
+        };
 
-      const sequelize = new Sequelize();
+        const mockAccountSafeFields = {
+          toJSON: () => mockAccountInfo,
+        };
 
-      jest.spyOn(AccountModel, 'findOne').mockResolvedValueOnce(null);
+        const sequelize = new Sequelize();
 
-      jest.spyOn(sequelize, 'model').mockReturnValueOnce(AccountModel);
+        jest
+          .spyOn(AccountModel, 'findOne')
+          .mockResolvedValueOnce(mockAccountSafeFields as any);
 
-      const accountRepository = new AccountRepository(sequelize);
+        jest.spyOn(sequelize, 'model').mockReturnValueOnce(AccountModel);
 
-      expect(() => accountRepository.retrieve(mockAccountId)).rejects.toThrow(
-        ErrorMessages.ACCOUNT_NOT_FOUND
-      );
+        const accountRepository = new AccountRepository(sequelize);
+
+        const result =
+          await accountRepository.retrieveSafeFieldsByUserhandleOrEmail(
+            mockUserEmail
+          );
+
+        expect(result).toEqual(mockAccountInfo);
+        expect(AccountModel.findOne).toHaveBeenCalledWith({
+          where: {
+            email: { [Op.eq]: mockUserEmail },
+            handle: { [Op.eq]: mockUserEmail },
+          },
+          attributes: ['id', 'email', 'handle'],
+        });
+      });
+
+      it('by user handle: should fail by trying to retrieve safe fields from an account that does not exist', async () => {
+        const mockUserEmail = 'someemail@email.com';
+
+        const sequelize = new Sequelize();
+
+        jest.spyOn(AccountModel, 'findOne').mockResolvedValueOnce(null);
+
+        jest.spyOn(sequelize, 'model').mockReturnValueOnce(AccountModel);
+
+        const accountRepository = new AccountRepository(sequelize);
+
+        expect(() =>
+          accountRepository.retrieveSafeFieldsByUserhandleOrEmail(mockUserEmail)
+        ).rejects.toThrow(ErrorMessages.ACCOUNT_NOT_FOUND);
+        expect(AccountModel.findOne).toHaveBeenCalledWith({
+          where: {
+            email: { [Op.eq]: mockUserEmail },
+            handle: { [Op.eq]: mockUserEmail },
+          },
+          attributes: ['id', 'email', 'handle'],
+        });
+      });
     });
   });
 });

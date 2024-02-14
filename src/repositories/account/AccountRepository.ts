@@ -12,6 +12,11 @@ import {
   RepositoryError,
 } from '../../utils/errors';
 
+type QueryForKeysOptions = {
+  fields: string[];
+  value: string;
+};
+
 class AccountRepository {
   private readonly db: ModelStatic<AccountModel>;
   constructor(private readonly sequelize: Sequelize) {
@@ -70,15 +75,33 @@ class AccountRepository {
     }
   }
 
-  async retrieveSafeFields(accountId: string): Promise<IAccountSafeFields> {
+  async retrieveSafeFieldsByAccountId(
+    accountId: string
+  ): Promise<IAccountSafeFields> {
+    const options = { fields: ['id'], value: accountId };
+    return this.retrieveSafeFields(options);
+  }
+
+  async retrieveSafeFieldsByUserhandleOrEmail(
+    accountIdentifier: string
+  ): Promise<IAccountSafeFields> {
+    const options = { fields: ['email', 'handle'], value: accountIdentifier };
+    return this.retrieveSafeFields(options);
+  }
+
+  private async retrieveSafeFields(
+    queryOptions: QueryForKeysOptions
+  ): Promise<IAccountSafeFields> {
     try {
+      const where = queryOptions.fields
+        .map((field) => ({
+          [field]: { [Op.eq]: queryOptions.value },
+        }))
+        .reduce((acc, curr) => ({ ...acc, ...curr }), {});
+
       const account = await this.db.findOne<AccountModel>({
+        where,
         attributes: ['id', 'email', 'handle'],
-        where: {
-          id: {
-            [Op.eq]: accountId,
-          },
-        },
       });
 
       if (!account) {
@@ -91,7 +114,7 @@ class AccountRepository {
         cause: error as Error,
         details: {
           repository: 'account',
-          input: accountId,
+          input: { queryOptions },
         },
       });
     }

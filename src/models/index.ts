@@ -10,6 +10,7 @@ import {
   accountSchema,
   createAccountAndProfileDtoSchema,
   createAccountDtoSchema,
+  loginDtoSchema,
 } from './account';
 import {
   CommentModel,
@@ -93,6 +94,7 @@ async function syncDb(): Promise<void> {
 }
 
 export {
+  loginDtoSchema,
   createCommentRequestDtoSchema,
   IRetrieveAccountAndProfileDto,
   SelectionModel,

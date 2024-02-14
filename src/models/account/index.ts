@@ -8,6 +8,7 @@ import {
   accountSchema,
   createAccountAndProfileDtoSchema,
   createAccountDtoSchema,
+  loginDtoSchema,
 } from './account';
 
 export {
@@ -20,4 +21,5 @@ export {
   ICreateAccounAndProfileDto,
   IRetrieveAccountAndProfileDto,
   IAccountSafeFields,
+  loginDtoSchema,
 };
