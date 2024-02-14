@@ -78,6 +78,7 @@ const ErrorMessagesProfile = {
 };
 
 const ErrorMessagesComment = {
+  CREATE_COMMENT_INVALID_DATA_FORMAT: "The comment's data format is invalid",
   CREATE_COMMENT_BODY_NOT_DEFINED: "The comment's body is not defined",
   COULD_NOT_DELETE_COMMENT: 'The comment could not be deleted',
   COMMENT_NOT_FOUND: 'Comment not found',

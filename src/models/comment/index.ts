@@ -4,6 +4,7 @@ import {
   ICreateCommentDto,
   commentSchema,
   createCommentDtoSchema,
+  createCommentRequestDtoSchema,
 } from './comment';
 
 export {
@@ -12,4 +13,5 @@ export {
   commentSchema,
   IComment,
   CommentModel,
+  createCommentRequestDtoSchema,
 };

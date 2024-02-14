@@ -17,6 +17,7 @@ import {
   ICreateCommentDto,
   commentSchema,
   createCommentDtoSchema,
+  createCommentRequestDtoSchema,
 } from './comment';
 import { db } from './db';
 import {
@@ -92,6 +93,7 @@ async function syncDb(): Promise<void> {
 }
 
 export {
+  createCommentRequestDtoSchema,
   IRetrieveAccountAndProfileDto,
   SelectionModel,
   selectionSchema,

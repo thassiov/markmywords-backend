@@ -33,6 +33,12 @@ CommentModel.init(
   }
 );
 
+const createCommentRequestDtoSchema = z.object({
+  body: z.string().min(1),
+  highlight_beginning: z.number().min(1).optional(),
+  highlight_end: z.number().min(1).optional(),
+});
+
 const createCommentDtoSchema = z.object({
   body: z.string().min(1),
   selectionId: z.string().uuid(),
@@ -52,4 +58,5 @@ export {
   commentSchema,
   IComment,
   CommentModel,
+  createCommentRequestDtoSchema,
 };
