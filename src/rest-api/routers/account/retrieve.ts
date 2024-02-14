@@ -8,6 +8,7 @@ import { EndpointHandler } from '../../../utils/types';
 
 const accountIdSchema = z.string().uuid();
 
+// @TODO I don't know if this handler should exist...
 function retrieveAccountHandlerFactory(
   accountService: AccountService
 ): EndpointHandler {
@@ -17,17 +18,24 @@ function retrieveAccountHandlerFactory(
   ): Promise<void> {
     try {
       if (!accountIdSchema.safeParse(req.params.accountId).success) {
-        res.status(StatusCodes.BAD_REQUEST).json({
+        res.status(StatusCodes.BAD_REQUEST).type('application/json').json({
           message: ErrorMessages.INVALID_ID,
         });
         return;
       }
 
-      const result = await accountService.retrieve(
+      const account = await accountService.retrieve(
         req.params.accountId as string
       );
 
-      res.status(StatusCodes.OK).json({ profile: result });
+      if (!account) {
+        res.status(StatusCodes.NOT_FOUND).type('application/json').json({
+          message: ErrorMessages.ACCOUNT_NOT_FOUND,
+        });
+        return;
+      }
+
+      res.status(StatusCodes.OK).json({ profile: account });
       return;
     } catch (error) {
       const errorMessage = (error as Error).message;

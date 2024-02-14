@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { Services } from '../../utils/types';
 import { setupAccountRouter } from './account';
+import { setupAuthRouter } from './auth';
 import { setupCommentRouter } from './comment';
 import { setupSelectionRouter } from './selection';
 
@@ -10,7 +11,8 @@ function setupRouter(services: Services): Router {
 
   // @TODO will need to create a 'is-authenticated' middleware
 
-  router.use('/', setupAccountRouter(services.account));
+  router.use('/', setupAuthRouter(services.auth, services.account));
+  router.use('/accounts', setupAccountRouter(services.account));
   router.use(
     '/selections',
     setupSelectionRouter(services.selection, services.comment)
