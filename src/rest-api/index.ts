@@ -6,6 +6,7 @@ import pinoHttp from 'pino-http';
 import { configs } from '../utils/configs';
 import { logger } from '../utils/logger';
 import { Services } from '../utils/types';
+import { addContext } from './middlewares/addContext';
 import { setupRouter } from './routers';
 
 const api = express();
@@ -20,7 +21,7 @@ function startApi(services: Services, listen = true): Express | void {
 
   const router = setupRouter(services);
 
-  api.use('/api/v1', router);
+  api.use('/api/v1', addContext, router);
 
   if (!listen) {
     return api;

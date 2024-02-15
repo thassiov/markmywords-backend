@@ -1,6 +1,9 @@
+import { logger } from './logger';
+
 type ErrorOpts = {
   details?: Record<string, unknown>;
   cause?: Error;
+  logError?: boolean;
 };
 
 export class CustomError extends Error {
@@ -21,6 +24,10 @@ export class CustomError extends Error {
         if (opts.cause.message) {
           this.message += `: ${opts.cause.message}`;
         }
+      }
+
+      if (opts.logError) {
+        logger.error(this);
       }
     }
   }
@@ -46,6 +53,10 @@ export class EndpointHandlerError extends CustomError {
   name = 'EndpointHandlerError';
 }
 
+export class ApiMiddlewareError extends CustomError {
+  name = 'ApiMiddlewareError';
+}
+
 export class ValidationError extends CustomError {
   name = 'ValidationError';
 }
@@ -57,6 +68,10 @@ export class ApplicationError extends CustomError {
 export class NotFoundError extends CustomError {
   name = 'NotFoundError';
 }
+
+const ErrorMessagesAuthorizationMiddleware = {
+  REQUEST_NOT_AUTHORIZED: "Not authorized to perform the request's action",
+};
 
 const ErrorMessagesAccount = {
   CREATE_ACCOUNT_INVALID_ACCOUNT_INFO: 'Account information is invalid',
@@ -100,4 +115,5 @@ export const ErrorMessages = {
   ...ErrorMessagesProfile,
   ...ErrorMessagesComment,
   ...ErrorMessagesShared,
+  ...ErrorMessagesAuthorizationMiddleware,
 };

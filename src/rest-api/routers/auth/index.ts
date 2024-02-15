@@ -4,8 +4,9 @@ import { AccountService } from '../../../services/account';
 import { AuthService } from '../../../services/auth';
 import { createAccountHandlerFactory } from '../account/create';
 import { loginHandlerFactory } from './login';
+import { logoutHandlerFactory } from './logout';
 
-function setupAuthRouter(
+function setupSignupLoginRouter(
   authService: AuthService,
   accountService: AccountService
 ): Router {
@@ -17,4 +18,16 @@ function setupAuthRouter(
   return router;
 }
 
-export { setupAuthRouter };
+function setupSessionRouter(
+  authService: AuthService,
+  _accountService: AccountService
+): Router {
+  const router = Router();
+
+  router.post('/logout', logoutHandlerFactory(authService));
+  // router.post('/refresh', refreshSessionHandlerFactory(authService, accountService));
+
+  return router;
+}
+
+export { setupSignupLoginRouter, setupSessionRouter };
