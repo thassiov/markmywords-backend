@@ -18,7 +18,7 @@ function setupRouter(services: Services): Router {
   router.use(
     '/session',
     requiresAuthentication,
-    setupSessionRouter(services.auth, services.account)
+    setupSessionRouter(services.auth)
   );
   router.use(
     '/accounts',
@@ -33,7 +33,7 @@ function setupRouter(services: Services): Router {
   router.use(
     '/comments',
     requiresAuthentication,
-    setupCommentRouter(services.comment, services.selection)
+    setupCommentRouter(services.comment)
   );
 
   return router;
