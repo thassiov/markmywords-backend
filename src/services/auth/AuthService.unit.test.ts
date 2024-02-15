@@ -44,31 +44,9 @@ describe('Auth Service', () => {
           mockJWTTokenRepository as any as JWTTokenRepository
         );
 
-        const result = authService.verifyAccessToken(
-          mockToken,
-          mockTokenPayload
-        );
+        const result = authService.verifyAccessToken(mockToken);
 
-        expect(result).toEqual(true);
-      });
-
-      it('catches an error when verifying a token with tampered payload', () => {
-        const mockTokenPayload = { accountId: 'thisuserexists' };
-
-        const mockToken = 'token';
-        (jsonwebtoken.verify as jest.Mock).mockReturnValueOnce({
-          accountId: 'thisuserdoesnotexist',
-        });
-
-        const authService = new AuthService(
-          mockJWTTokenRepository as any as JWTTokenRepository
-        );
-
-        expect(() =>
-          authService.verifyAccessToken(mockToken, mockTokenPayload)
-        ).toThrow(
-          'Could not verify jwt token: Expected values to be strictly deep-equal'
-        );
+        expect(result).toEqual(mockTokenPayload);
       });
 
       it('should invalidate a given accessToken', async () => {
@@ -123,31 +101,9 @@ describe('Auth Service', () => {
           mockJWTTokenRepository as any as JWTTokenRepository
         );
 
-        const result = authService.verifyRefreshToken(
-          mockToken,
-          mockTokenPayload
-        );
+        const result = authService.verifyRefreshToken(mockToken);
 
-        expect(result).toEqual(true);
-      });
-
-      it('catches an error when verifying a token with tampered payload', () => {
-        const mockTokenPayload = { accountId: 'thisuserexists' };
-
-        const mockToken = 'token';
-        (jsonwebtoken.verify as jest.Mock).mockReturnValueOnce({
-          accountId: 'thisuserdoesnotexist',
-        });
-
-        const authService = new AuthService(
-          mockJWTTokenRepository as any as JWTTokenRepository
-        );
-
-        expect(() =>
-          authService.verifyRefreshToken(mockToken, mockTokenPayload)
-        ).toThrow(
-          'Could not verify jwt token: Expected values to be strictly deep-equal'
-        );
+        expect(result).toEqual(mockTokenPayload);
       });
 
       it('should invalidate a given refreshToken', async () => {

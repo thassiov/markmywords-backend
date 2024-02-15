@@ -1,9 +1,9 @@
 import { sign, verify } from 'jsonwebtoken';
-import { deepStrictEqual } from 'node:assert/strict';
 
 import { JWTTokenRepository } from '../../repositories/token';
 import { configs } from '../../utils/configs';
-import { ServiceError, ValidationError } from '../../utils/errors';
+import { ServiceError } from '../../utils/errors';
+import { logger } from '../../utils/logger';
 
 // @NOTE I think I'll set it to 'accountId: <string>, roles: [<string>]' later on
 type TokenPayload = { accountId: string };
@@ -34,12 +34,12 @@ class AuthService {
     }
   }
 
-  verifyAccessToken(accessToken: string, payload: TokenPayload): boolean {
+  verifyAccessToken(accessToken: string): TokenPayload | null {
     try {
       const secretOrPubKey =
         configs.appJWTAccessTokenPublicKey || configs.appJWTAccessTokenSecret;
 
-      return this.verifyJWTToken(accessToken, payload, secretOrPubKey);
+      return this.verifyJWTTokenPayload(accessToken, secretOrPubKey);
     } catch (error) {
       throw new ServiceError('Error during access token verification', {
         cause: error as Error,
@@ -90,12 +90,12 @@ class AuthService {
     }
   }
 
-  verifyRefreshToken(refreshToken: string, payload: TokenPayload): boolean {
+  verifyRefreshToken(refreshToken: string): TokenPayload | null {
     try {
       const secretOrPubKey =
         configs.appJWTRefreshTokenPublicKey || configs.appJWTRefreshTokenSecret;
 
-      return this.verifyJWTToken(refreshToken, payload, secretOrPubKey);
+      return this.verifyJWTTokenPayload(refreshToken, secretOrPubKey);
     } catch (error) {
       throw new ServiceError('Error during refresh token verification', {
         cause: error as Error,
@@ -151,20 +151,20 @@ class AuthService {
     }
   }
 
-  private verifyJWTToken(
+  private verifyJWTTokenPayload(
     accessToken: string,
-    payload: TokenPayload,
     secretOrPublicKey: string
-  ): boolean {
+  ): TokenPayload | null {
     try {
-      const tokenPayload = verify(accessToken, secretOrPublicKey, {
+      const payload = verify(accessToken, secretOrPublicKey, {
         algorithms: [JWT_ALGORITHM],
-      });
+      }) as TokenPayload;
 
-      // @NOTE if this check fails, it will throw an error
-      deepStrictEqual(tokenPayload, payload);
+      if (!payload.accountId) {
+        return null;
+      }
 
-      return true;
+      return { accountId: payload.accountId };
     } catch (error) {
       const errorName = (error as Error).name;
       const jwtErrors = [
@@ -174,10 +174,12 @@ class AuthService {
       ];
 
       if (jwtErrors.includes(errorName)) {
-        throw new ValidationError('Invalid access token', {
+        logger.error('Invalid access token', {
           cause: error as Error,
           details: { input: accessToken },
         });
+
+        return null;
       }
 
       throw new ServiceError('Could not verify jwt token', {
