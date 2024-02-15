@@ -1,5 +1,6 @@
 import jsonwebtoken from 'jsonwebtoken';
 
+import { IJWTToken } from '../../models';
 import { JWTTokenRepository } from '../../repositories/token';
 import { AuthService } from './AuthService';
 
@@ -13,6 +14,7 @@ describe('Auth Service', () => {
 
   const mockJWTTokenRepository = {
     create: jest.fn(),
+    retrieve: jest.fn(),
   };
 
   describe('jwt token', () => {
@@ -127,6 +129,38 @@ describe('Auth Service', () => {
         const result = await authService.invalidateRefreshToken(mockToken);
 
         expect(result).toEqual(mockInvalidatedTokenId);
+      });
+    });
+
+    describe('check for invalidation', () => {
+      it('should return true for invalidaded token (present in the invalidated_token table)', async () => {
+        const mockToken = 'token';
+        (mockJWTTokenRepository.retrieve as jest.Mock).mockReturnValueOnce(
+          {} as IJWTToken
+        );
+
+        const authService = new AuthService(
+          mockJWTTokenRepository as any as JWTTokenRepository
+        );
+
+        const result = await authService.wasJWTTokenInvalidated(mockToken);
+
+        expect(result).toEqual(true);
+      });
+
+      it('should return false for a non invalidaded token (not present in the invalidated_token table)', async () => {
+        const mockToken = 'token';
+        (mockJWTTokenRepository.retrieve as jest.Mock).mockReturnValueOnce(
+          null
+        );
+
+        const authService = new AuthService(
+          mockJWTTokenRepository as any as JWTTokenRepository
+        );
+
+        const result = await authService.wasJWTTokenInvalidated(mockToken);
+
+        expect(result).toEqual(false);
       });
     });
   });

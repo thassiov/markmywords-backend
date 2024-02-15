@@ -128,6 +128,28 @@ class AuthService {
     }
   }
 
+  async wasJWTTokenInvalidated(token: string): Promise<boolean> {
+    try {
+      const result = await this.repository.retrieve(token);
+
+      if (!result) {
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      throw new ServiceError(
+        'Could not verify presence of jwt token in the invalidation table',
+        {
+          cause: error as Error,
+          details: {
+            service: 'auth',
+          },
+        }
+      );
+    }
+  }
+
   private issueJWTToken(
     payload: TokenPayload,
     secretOrPrivateKey: string,

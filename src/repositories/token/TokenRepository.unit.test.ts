@@ -98,4 +98,47 @@ describe('JWTToken Repository', () => {
       expect(result).toEqual(true);
     });
   });
+
+  describe('retrieve', () => {
+    it('retrieves an invalidated toke from the db', async () => {
+      const mockJWTTokenString = 'some.jwt.token';
+      const mockJWTRecord = {
+        id: 'someid',
+        token: mockJWTTokenString,
+        type: 'access',
+        expiresAt: new Date(),
+        accountId: 'someaccountid',
+      };
+
+      const sequelize = new Sequelize();
+
+      jest.spyOn(JWTTokenModel, 'findOne').mockResolvedValueOnce({
+        toJSON: () => mockJWTRecord,
+      } as JWTTokenModel);
+
+      jest.spyOn(sequelize, 'model').mockReturnValueOnce(JWTTokenModel);
+
+      const tokenRepository = new JWTTokenRepository(sequelize);
+
+      const result = await tokenRepository.retrieve(mockJWTTokenString);
+
+      expect(result).toEqual(mockJWTRecord);
+    });
+
+    it('tries to retrieve an invalidated toke from the db that does not exist', async () => {
+      const mockJWTTokenString = 'some.jwt.token';
+
+      const sequelize = new Sequelize();
+
+      jest.spyOn(JWTTokenModel, 'findOne').mockResolvedValueOnce(null);
+
+      jest.spyOn(sequelize, 'model').mockReturnValueOnce(JWTTokenModel);
+
+      const tokenRepository = new JWTTokenRepository(sequelize);
+
+      const result = await tokenRepository.retrieve(mockJWTTokenString);
+
+      expect(result).toEqual(null);
+    });
+  });
 });

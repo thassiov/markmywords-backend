@@ -56,7 +56,31 @@ class JWTTokenRepository {
         cause: error as Error,
         details: {
           repository: 'token',
-          input: tokenString,
+        },
+      });
+    }
+  }
+
+  async retrieve(tokenString: string): Promise<IJWTToken | null> {
+    try {
+      const result = await this.db.findOne<JWTTokenModel>({
+        where: {
+          token: {
+            [Op.eq]: tokenString,
+          },
+        },
+      });
+
+      if (!result) {
+        return null;
+      }
+
+      return result.toJSON();
+    } catch (error) {
+      throw new RepositoryError('Could not retrieve token from db', {
+        cause: error as Error,
+        details: {
+          repository: 'token',
         },
       });
     }
