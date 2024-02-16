@@ -104,6 +104,7 @@ export {
   ISelection,
   SelectionDto,
   syncDb,
+  db,
   IProfile,
   profileSchema,
   IAccount,

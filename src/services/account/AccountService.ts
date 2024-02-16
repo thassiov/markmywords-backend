@@ -46,7 +46,7 @@ class AccountService {
 
       return accountId;
     } catch (error) {
-      throw new ServiceError('Could not create new account', {
+      throw new ServiceError('Could not store new account record', {
         cause: error as Error,
         details: {
           service: 'account',

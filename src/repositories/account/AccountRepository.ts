@@ -12,7 +12,11 @@ import {
   IAccount,
   IAccountSafeFields,
 } from '../../models/account';
-import { RepositoryError } from '../../utils/errors';
+import {
+  ErrorMessages,
+  RepositoryError,
+  ValidationError,
+} from '../../utils/errors';
 
 type QueryForKeysOptions = {
   fields: string[];
@@ -36,6 +40,26 @@ class AccountRepository {
       return newAccount.get('id') as string;
     } catch (error) {
       await transaction.rollback();
+
+      if ((error as Error).name === 'SequelizeUniqueConstraintError') {
+        const field = (error as Error & { fields: string[] }).fields[0];
+
+        let problem;
+
+        switch (field) {
+          case 'handle':
+            problem = ErrorMessages.CREATE_ACCOUNT_USERHANDLE_ALREADY_IN_USE;
+            break;
+          case 'email':
+            problem = ErrorMessages.CREATE_ACCOUNT_EMAIL_ALREADY_IN_USE;
+            break;
+          default:
+            problem = `Field ${field} must be unique`;
+        }
+
+        throw new ValidationError(problem);
+      }
+
       throw new RepositoryError('Could not create new account', {
         cause: error as Error,
         details: {

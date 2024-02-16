@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import asyncHandler from 'express-async-handler';
 
 import { AccountService } from '../../../services/account';
 import { AuthService } from '../../../services/auth';
@@ -13,7 +14,10 @@ function setupSignupLoginRouter(
 ): Router {
   const router = Router();
 
-  router.post('/signup', createAccountHandlerFactory(accountService));
+  router.post(
+    '/signup',
+    asyncHandler(createAccountHandlerFactory(accountService))
+  );
   router.post('/login', loginHandlerFactory(authService, accountService));
 
   return router;

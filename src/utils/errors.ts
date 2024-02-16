@@ -1,9 +1,6 @@
-import { logger } from './logger';
-
 type ErrorOpts = {
   details?: Record<string, unknown>;
   cause?: Error;
-  logError?: boolean;
 };
 
 export class CustomError extends Error {
@@ -25,11 +22,19 @@ export class CustomError extends Error {
           this.message += `: ${opts.cause.message}`;
         }
       }
-
-      if (opts.logError) {
-        logger.error(this);
-      }
     }
+  }
+
+  unwrapCause(): Error {
+    if (this?.cause instanceof CustomError) {
+      return this.cause.unwrapCause();
+    }
+
+    if (this.cause instanceof Error) {
+      return this.cause;
+    }
+
+    return this;
   }
 }
 

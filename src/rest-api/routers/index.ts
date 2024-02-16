@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import { Services } from '../../utils/types';
+import { errorHandler } from '../middlewares/errorHandler';
 import { requiresAuthenticationMiddlewareFactory } from '../middlewares/requiresAuthentication';
 import { setupAccountRouter } from './account';
 import { setupSessionRouter, setupSignupLoginRouter } from './auth';
@@ -35,6 +36,8 @@ function setupRouter(services: Services): Router {
     requiresAuthentication,
     setupCommentRouter(services.comment)
   );
+
+  router.use(errorHandler);
 
   return router;
 }

@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 
 import { configs } from '../../utils/configs';
+import { CustomError } from '../../utils/errors';
 import { logger } from '../../utils/logger';
 
 function errorHandler(
@@ -9,23 +11,23 @@ function errorHandler(
   res: Response,
   _n: NextFunction
 ): void {
-  // @TODO I need to process this output
+  const details = err instanceof CustomError ? err.unwrapCause() : err;
+  logger.error(details);
 
-  logger.error(err.stack);
+  let payload = {} as { message: string; details?: Error };
 
-  const statusCode = (err as any).statusCode || 500;
+  if (configs.appEnvironment === 'production') {
+    payload.message = 'Internal Server Error';
+  } else {
+    payload.message = err.message;
+    payload.details = details;
+  }
 
-  const message =
-    configs.appEnvironment == 'production'
-      ? 'Internal Server Error'
-      : err.message;
-
-  res.status(statusCode).json({
-    error: {
-      message,
-      status: statusCode,
-    },
-  });
+  res
+    .status(StatusCodes.INTERNAL_SERVER_ERROR)
+    .type('application/json')
+    .json(payload);
+  return;
 }
 
 export { errorHandler };

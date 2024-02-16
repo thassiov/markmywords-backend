@@ -51,7 +51,10 @@ const jwtConfigs = {
 
 const dbConfigs = {
   dbType: process.env.DB_TYPE || 'sqlite',
-  dbLocation: process.env.DB_LOCATION || '/tmp/mmwdatabase.sqlite',
+  dbLocation:
+    process.env.DB_LOCATION || process.env.NODE_ENV === 'test'
+      ? ':memory:'
+      : '/tmp/mmwdatabase.sqlite',
   dbUser: process.env.DB_USER || 'localuser',
   dbPassword: process.env.DB_PASSWORD || 'password',
   dbHost: process.env.DB_HOST || 'localhost',

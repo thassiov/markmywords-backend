@@ -1,5 +1,15 @@
 import pino from 'pino';
+import pinoPretty from 'pino-pretty';
 
-const logger = pino();
+import { configs } from './configs';
 
-export { logger };
+const prettyLog = pinoPretty({
+  colorize: true,
+  sync: true,
+});
+
+const logger = pino(
+  configs.appEnvironment !== 'production' ? prettyLog : undefined
+);
+
+export { logger, prettyLog };
