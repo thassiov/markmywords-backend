@@ -54,18 +54,13 @@ describe('REST: login loginHandler', () => {
     const mockRes = getMockRes().res;
     await loginHandler(mockReq, mockRes);
 
-    expect(mockRes.status).toHaveBeenCalledWith(StatusCodes.OK);
-    expect(mockRes.setHeader).toHaveBeenNthCalledWith(
-      1,
-      'Set-Cookie',
-      `accessToken=${mockAccessToken}; Max-Age=${configs.appCookiesAccessTokenMaxAge}; Domain=${configs.appCookiesDomain}${configs.appCookiesHttpOnly ? '; HttpOnly' : undefined}`
-    );
+    const cookies = [
+      `accessToken=${mockAccessToken}; Max-Age=${configs.appCookiesAccessTokenMaxAge}; Domain=${configs.appCookiesDomain}${configs.appCookiesHttpOnly ? '; HttpOnly' : undefined}`,
+      `refreshToken=${mockRefreshToken}; Max-Age=${configs.appCookiesRefreshTokenMaxAge}; Domain=${configs.appCookiesDomain}${configs.appCookiesHttpOnly ? '; HttpOnly' : undefined}`,
+    ];
 
-    expect(mockRes.setHeader).toHaveBeenNthCalledWith(
-      2,
-      'Set-Cookie',
-      `refreshToken=${mockRefreshToken}; Max-Age=${configs.appCookiesRefreshTokenMaxAge}; Domain=${configs.appCookiesDomain}${configs.appCookiesHttpOnly ? '; HttpOnly' : undefined}`
-    );
+    expect(mockRes.status).toHaveBeenCalledWith(StatusCodes.OK);
+    expect(mockRes.setHeader).toHaveBeenCalledWith('Set-Cookie', cookies);
     expect(mockRes.send).toHaveBeenCalled();
   });
 

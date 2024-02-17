@@ -11,7 +11,11 @@ try {
       ? `${configs.dbType}:${configs.dbLocation}`
       : `${configs.dbType}://${configs.dbUser}:${configs.dbPassword}@${configs.dbHost}:${configs.dbPort}/${configs.dbName}`;
 
-  db = new Sequelize(dbConnectString, { logging: false });
+  const opts = {
+    logging: configs.appEnvironment !== 'production' ? false : undefined,
+  };
+
+  db = new Sequelize(dbConnectString, opts);
 } catch (error) {
   throw new DatabaseInstanceError(
     'Error creating database instance. Please check the database configuration and connection parameters',

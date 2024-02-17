@@ -1,8 +1,8 @@
 import cors from 'cors';
 import express, { Express } from 'express';
 import helmet from 'helmet';
-import pinoHttp from 'pino-http';
 
+// import pinoHttp from 'pino-http';
 import { configs } from '../utils/configs';
 import { logger } from '../utils/logger';
 import { Services } from '../utils/types';
@@ -15,7 +15,7 @@ function startApi(services: Services, listen = true): Express | void {
   // @TODO enable compression
   api.use(express.json({ limit: '100kb' }));
   api.use(express.urlencoded({ limit: '100kb' }));
-  api.use(pinoHttp());
+  // api.use(pinoHttp());
   api.use(cors());
   api.use(helmet());
 

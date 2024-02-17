@@ -42,26 +42,22 @@ function loginHandlerFactory(
       const accessToken = authService.issueAccessToken(tokenPayload);
       const refreshToken = authService.issueRefreshToken(tokenPayload);
 
-      res.setHeader(
-        'Set-Cookie',
+      const cookies = [
         cookie.serialize('accessToken', accessToken, {
           httpOnly: configs.appCookiesHttpOnly,
           maxAge: configs.appCookiesAccessTokenMaxAge,
           secure: configs.appCookiesSecure,
           domain: configs.appCookiesDomain,
-        })
-      );
-
-      res.setHeader(
-        'Set-Cookie',
+        }),
         cookie.serialize('refreshToken', refreshToken, {
           httpOnly: configs.appCookiesHttpOnly,
           maxAge: configs.appCookiesRefreshTokenMaxAge,
           secure: configs.appCookiesSecure,
           domain: configs.appCookiesDomain,
-        })
-      );
+        }),
+      ];
 
+      res.setHeader('Set-Cookie', cookies);
       res.status(StatusCodes.OK).send();
       return;
     } catch (error) {

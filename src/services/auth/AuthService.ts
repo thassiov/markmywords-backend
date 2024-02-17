@@ -8,7 +8,10 @@ import { logger } from '../../utils/logger';
 // @NOTE I think I'll set it to 'accountId: <string>, roles: [<string>]' later on
 type TokenPayload = { accountId: string };
 type TokenType = 'access' | 'refresh';
-const JWT_ALGORITHM = 'RS256';
+const JWT_ALGORITHM =
+  configs.appJWTAccessTokenPublicKey && configs.appJWTAccessTokenPrivateKey
+    ? 'RS256'
+    : 'HS256';
 
 class AuthService {
   constructor(private readonly repository: JWTTokenRepository) {}
@@ -78,7 +81,12 @@ class AuthService {
         configs.appJWTRefreshTokenPrivateKey ||
         configs.appJWTRefreshTokenSecret;
 
-      return this.issueJWTToken(payload, secretOrPrivKey);
+      // it makes sense to use the refresh expiration the same as the cookie where it is stored in
+      return this.issueJWTToken(
+        payload,
+        secretOrPrivKey,
+        configs.appCookiesRefreshTokenMaxAge
+      );
     } catch (error) {
       throw new ServiceError('Error during refresh token issue', {
         cause: error as Error,

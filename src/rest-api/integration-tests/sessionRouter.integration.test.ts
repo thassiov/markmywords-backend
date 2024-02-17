@@ -6,23 +6,28 @@ import Supertest from 'supertest';
 
 import { AccountModel } from '../../models';
 import { ProfileModel } from '../../models/profile';
+import { AccountRepository, ProfileRepository } from '../../repositories';
+import { AccountService } from '../../services/account';
 import { ErrorMessages } from '../../utils/errors';
 import { setupServer } from './setupServer';
 
 describe('INTEGRATION: signup, login and session routes', () => {
   let api: Express,
     db: Sequelize,
-    // tokenModel: ModelStatic<JWTTokenModel>,
     accountModel: ModelStatic<AccountModel>,
-    profileModel: ModelStatic<ProfileModel>;
+    profileModel: ModelStatic<ProfileModel>,
+    mockAccountService: AccountService;
 
   beforeAll(async () => {
     const server = await setupServer();
     api = server.api;
     db = server.db;
-    // tokenModel = db.model('invalidated_jwttokens');
     accountModel = db.model('account');
     profileModel = db.model('profile');
+    mockAccountService = new AccountService(
+      {} as AccountRepository,
+      {} as ProfileRepository
+    );
   });
 
   afterEach(async () => {
@@ -140,6 +145,49 @@ describe('INTEGRATION: signup, login and session routes', () => {
       expect(response.body.message).toEqual(
         ErrorMessages.CREATE_ACCOUNT_EMAIL_ALREADY_IN_USE
       );
+    });
+  });
+
+  describe('/login', () => {
+    it('should login an existing user with user handle', async () => {
+      const mockUserhandle = 'someuserhandle';
+      const mockPassword = 'somepassword';
+      const mockHashedPassword =
+        await mockAccountService.hashPassword(mockPassword);
+      const mockLoginData = {
+        login: mockUserhandle,
+        password: mockPassword,
+      };
+
+      await accountModel.create({
+        email: 'someemail1@email.com',
+        handle: mockUserhandle,
+        password: mockHashedPassword,
+      });
+
+      const apiResponse = await Supertest(api)
+        .post('/api/v1/login')
+        .send(mockLoginData)
+        .set('Accept', 'application/json');
+
+      expect(apiResponse.status).toEqual(StatusCodes.OK);
+      expect(
+        (apiResponse.headers['set-cookie'] as unknown as Array<string>).some(
+          (cookie) =>
+            ['accessToken', 'Max-Age', 'Domain', 'HttpOnly'].every((prop) =>
+              cookie.includes(prop)
+            )
+        )
+      ).toEqual(true);
+
+      expect(
+        (apiResponse.headers['set-cookie'] as unknown as Array<string>).some(
+          (cookie) =>
+            ['refreshToken', 'Max-Age', 'Domain', 'HttpOnly'].every((prop) =>
+              cookie.includes(prop)
+            )
+        )
+      ).toEqual(true);
     });
   });
 });

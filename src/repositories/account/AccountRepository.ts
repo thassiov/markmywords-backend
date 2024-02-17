@@ -1,10 +1,4 @@
-import {
-  ModelStatic,
-  Op,
-  Sequelize,
-  Transaction,
-  WhereOptions,
-} from 'sequelize';
+import { ModelStatic, Op, Sequelize, Transaction } from 'sequelize';
 
 import { ICreateAccountDto } from '../../models';
 import {
@@ -21,6 +15,7 @@ import {
 type QueryForKeysOptions = {
   fields: string[];
   value: string;
+  or?: boolean;
 };
 
 class AccountRepository {
@@ -111,7 +106,11 @@ class AccountRepository {
   async retrieveSafeFieldsByUserhandleOrEmail(
     accountIdentifier: string
   ): Promise<IAccountSafeFields | null> {
-    const options = { fields: ['email', 'handle'], value: accountIdentifier };
+    const options = {
+      fields: ['email', 'handle'],
+      value: accountIdentifier,
+      or: true,
+    };
     return this.retrieveSafeFields(options);
   }
 
@@ -123,7 +122,11 @@ class AccountRepository {
   async retrieveByUserhandleOrEmail(
     accountIdentifier: string
   ): Promise<IAccount | null> {
-    const options = { fields: ['email', 'handle'], value: accountIdentifier };
+    const options = {
+      fields: ['email', 'handle'],
+      value: accountIdentifier,
+      or: true,
+    };
     return this.retrieve(options);
   }
 
@@ -131,8 +134,13 @@ class AccountRepository {
     queryOptions: QueryForKeysOptions
   ): Promise<IAccountSafeFields | null> {
     try {
+      const { or, ...opts } = queryOptions;
+      const query = or
+        ? this.setQueryOptions(opts)
+        : this.setQueryOptions(opts, false);
+
       const account = await this.db.findOne<AccountModel>({
-        where: this.setQueryOptions(queryOptions),
+        where: or ? { [Op.or]: query } : query,
         attributes: ['id', 'email', 'handle'],
       });
 
@@ -156,8 +164,13 @@ class AccountRepository {
     queryOptions: QueryForKeysOptions
   ): Promise<IAccount | null> {
     try {
+      const { or, ...opts } = queryOptions;
+      const query = or
+        ? this.setQueryOptions(opts)
+        : this.setQueryOptions(opts, false);
+
       const account = await this.db.findOne<AccountModel>({
-        where: this.setQueryOptions(queryOptions),
+        where: or ? { [Op.or]: query } : query,
       });
 
       if (!account) {
@@ -180,12 +193,27 @@ class AccountRepository {
     return t;
   }
 
-  private setQueryOptions(queryOptions: QueryForKeysOptions): WhereOptions {
-    return queryOptions.fields
-      .map((field) => ({
-        [field]: { [Op.eq]: queryOptions.value },
-      }))
-      .reduce((acc, curr) => ({ ...acc, ...curr }), {});
+  private setQueryOptions(
+    queryOptions: QueryForKeysOptions,
+    asList = true
+  ): Record<string, string>[] | Record<string, string> {
+    if (asList) {
+      const list: Record<string, string>[] = [];
+
+      queryOptions.fields.forEach((field) => {
+        list.push({ [field]: queryOptions.value });
+      });
+
+      return list;
+    }
+
+    const obj: Record<string, string> = {};
+
+    queryOptions.fields.forEach((field) => {
+      obj[field] = queryOptions.value;
+    });
+
+    return obj;
   }
 }
 

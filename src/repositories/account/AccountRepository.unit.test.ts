@@ -165,8 +165,7 @@ describe('Account Repository', () => {
         expect(result).toEqual(mockAccountInfo);
         expect(AccountModel.findOne).toHaveBeenCalledWith({
           where: {
-            email: { [Op.eq]: mockUserHandle },
-            handle: { [Op.eq]: mockUserHandle },
+            [Op.or]: [{ email: mockUserHandle }, { handle: mockUserHandle }],
           },
         });
       });
@@ -187,8 +186,7 @@ describe('Account Repository', () => {
         expect(result).toEqual(null);
         expect(AccountModel.findOne).toHaveBeenCalledWith({
           where: {
-            email: { [Op.eq]: mockUserHandle },
-            handle: { [Op.eq]: mockUserHandle },
+            [Op.or]: [{ email: mockUserHandle }, { handle: mockUserHandle }],
           },
         });
       });
@@ -222,8 +220,7 @@ describe('Account Repository', () => {
         expect(result).toEqual(mockAccountInfo);
         expect(AccountModel.findOne).toHaveBeenCalledWith({
           where: {
-            email: { [Op.eq]: mockUserEmail },
-            handle: { [Op.eq]: mockUserEmail },
+            [Op.or]: [{ email: mockUserEmail }, { handle: mockUserEmail }],
           },
         });
       });
@@ -244,14 +241,13 @@ describe('Account Repository', () => {
         expect(result).toEqual(null);
         expect(AccountModel.findOne).toHaveBeenCalledWith({
           where: {
-            email: { [Op.eq]: mockUserEmail },
-            handle: { [Op.eq]: mockUserEmail },
+            [Op.or]: [{ email: mockUserEmail }, { handle: mockUserEmail }],
           },
         });
       });
     });
 
-    describe('safe fields by account Id', () => {
+    describe.only('safe fields by account Id', () => {
       it('should retrieve safe fields (no password) from the account', async () => {
         const mockAccountId = 'someaccountid';
         const mockAccountInfo = {
@@ -280,7 +276,7 @@ describe('Account Repository', () => {
         expect(result).toEqual(mockAccountInfo);
         expect(AccountModel.findOne).toHaveBeenCalledWith({
           where: {
-            id: { [Op.eq]: mockAccountId },
+            id: mockAccountId,
           },
           attributes: ['id', 'email', 'handle'],
         });
@@ -302,7 +298,7 @@ describe('Account Repository', () => {
         expect(result).toEqual(null);
         expect(AccountModel.findOne).toHaveBeenCalledWith({
           where: {
-            id: { [Op.eq]: mockAccountId },
+            id: mockAccountId,
           },
           attributes: ['id', 'email', 'handle'],
         });
@@ -340,8 +336,7 @@ describe('Account Repository', () => {
         expect(result).toEqual(mockAccountInfo);
         expect(AccountModel.findOne).toHaveBeenCalledWith({
           where: {
-            email: { [Op.eq]: mockUserHandle },
-            handle: { [Op.eq]: mockUserHandle },
+            [Op.or]: [{ email: mockUserHandle }, { handle: mockUserHandle }],
           },
           attributes: ['id', 'email', 'handle'],
         });
@@ -365,8 +360,7 @@ describe('Account Repository', () => {
         expect(result).toEqual(null);
         expect(AccountModel.findOne).toHaveBeenCalledWith({
           where: {
-            email: { [Op.eq]: mockUserHandle },
-            handle: { [Op.eq]: mockUserHandle },
+            [Op.or]: [{ email: mockUserHandle }, { handle: mockUserHandle }],
           },
           attributes: ['id', 'email', 'handle'],
         });
@@ -402,14 +396,13 @@ describe('Account Repository', () => {
         expect(result).toEqual(mockAccountInfo);
         expect(AccountModel.findOne).toHaveBeenCalledWith({
           where: {
-            email: { [Op.eq]: mockUserEmail },
-            handle: { [Op.eq]: mockUserEmail },
+            [Op.or]: [{ email: mockUserEmail }, { handle: mockUserEmail }],
           },
           attributes: ['id', 'email', 'handle'],
         });
       });
 
-      it('by user handle: should fail by trying to retrieve safe fields from an account that does not exist', async () => {
+      it('by user email: should fail by trying to retrieve safe fields from an account that does not exist', async () => {
         const mockUserEmail = 'someemail@email.com';
 
         const sequelize = new Sequelize();
@@ -427,8 +420,7 @@ describe('Account Repository', () => {
         expect(result).toEqual(null);
         expect(AccountModel.findOne).toHaveBeenCalledWith({
           where: {
-            email: { [Op.eq]: mockUserEmail },
-            handle: { [Op.eq]: mockUserEmail },
+            [Op.or]: [{ email: mockUserEmail }, { handle: mockUserEmail }],
           },
           attributes: ['id', 'email', 'handle'],
         });
